@@ -63,15 +63,18 @@ namespace Livesplit.DarkSoulsTracker
 
         public void Stop()
         {
-            while (_thread.IsAlive)
+            if (_thread != null)
             {
-                _cancelSource.Cancel();
+                while (_thread.IsAlive)
+                {
+                    _cancelSource.Cancel();
+                }
+                Thread unhookThread = new Thread(unhook)
+                {
+                    IsBackground = true
+                };
+                unhookThread.Start();
             }
-            Thread unhookThread = new Thread(unhook)
-            {
-                IsBackground = true
-            };
-            unhookThread.Start();
         }
 
         private void MaintThread()

@@ -357,8 +357,7 @@ namespace Livesplit.DarkSoulsTracker
             double bonfiresPercentage = kindledBonfires * (0.05 / Flags.TotalBonfireFlags.Length);
 
             totalCompletionPercentage = itemPercentage + bossPercentage + nonrespawningPercentage + questlinesPercentage + shortcutsLockedDoorsPercentage + illusoryWallsPercentage + foggatesPercentage + bonfiresPercentage;
-            totalCompletionPercentage = Math.Floor(totalCompletionPercentage * 1000);
-            totalCompletionPercentage /= 10;
+            totalCompletionPercentage *= 100;
         }
             
         public int GetClearCount()

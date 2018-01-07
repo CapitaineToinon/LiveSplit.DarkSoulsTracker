@@ -5,15 +5,15 @@ using System;
 using LiveSplit.Model;
 
 
-[assembly: ComponentFactory(typeof(DARKSOULSFactory))]
+[assembly: ComponentFactory(typeof(DarkSoulsTrackerFactory))]
 
 namespace Livesplit.DarkSoulsTracker
 {
-    public class DARKSOULSFactory : IComponentFactory
+    public class DarkSoulsTrackerFactory : IComponentFactory
     {
         public string ComponentName
         {
-            get { return "Dark Souls 100% Tracker"; }
+            get { return "Dark Souls 100%"; }
         }
 
         public string Description
@@ -28,7 +28,7 @@ namespace Livesplit.DarkSoulsTracker
 
         public IComponent Create(LiveSplitState state)
         {
-            return new DARKSOULS(state);
+            return new DarkSoulsTrackerComponant(state);
         }
 
         public string UpdateName

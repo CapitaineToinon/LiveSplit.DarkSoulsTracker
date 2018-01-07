@@ -51,7 +51,18 @@
   <ItemGroup>
     <Compile Include="DarkSoulsTrackerUIComponant.cs" />
     <Compile Include="DarkSoulsTrackerUIFactory.cs" />
+    <Compile Include="DarkSoulsTrackerUISettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DarkSoulsTrackerUISettings.Designer.cs">
+      <DependentUpon>DarkSoulsTrackerUISettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DarkSoulsTrackerUISettings.resx">
+      <DependentUpon>DarkSoulsTrackerUISettings.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

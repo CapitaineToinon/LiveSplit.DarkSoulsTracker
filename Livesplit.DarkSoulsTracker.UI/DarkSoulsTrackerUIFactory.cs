@@ -12,12 +12,12 @@ namespace Livesplit.DarkSoulsTracker.UI
     {
         public string ComponentName
         {
-            get { return "Dark Souls 100% Tracker UI"; }
+            get { return "Dark Souls 100% UI"; }
         }
 
         public string Description
         {
-            get { return "Tracker for Dark Souls 100%."; }
+            get { return "Memory Tracker for Dark Souls 100%."; }
         }
 
         public ComponentCategory Category
@@ -47,7 +47,7 @@ namespace Livesplit.DarkSoulsTracker.UI
 
         public string XMLURL
         {
-            get { return this.UpdateURL + "Components/update.LiveSplit.HaloSplit.UI.xml"; }
+            get { return ""; }
         }
     }
 }

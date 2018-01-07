@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Livesplit.DarkSoulsTracker
 {
-    public class DARKSOULS : LogicComponent
+    public class DarkSoulsTrackerComponant : LogicComponent
     {
         #region Variables
         private TimerModel _timer;
@@ -32,7 +32,7 @@ namespace Livesplit.DarkSoulsTracker
             get { return "Dark Souls 100% Tracker"; }
         }
 
-        public DARKSOULS(LiveSplitState state)
+        public DarkSoulsTrackerComponant(LiveSplitState state)
         {
             _state = state;
             _timer = new TimerModel();
@@ -40,7 +40,6 @@ namespace Livesplit.DarkSoulsTracker
 
             _gameMemory = new GameMemory();
             _gameMemory.UpdatePercentage += gameMemory_UpdatePercentage;
-            // _gameMemory.UpdateDebug += _gameMemory_UpdateDebug;
             _state.OnStart += gameMemory_OnStart;
             _state.OnReset += gameMemory_OnReset;
         }
@@ -53,7 +52,7 @@ namespace Livesplit.DarkSoulsTracker
             }    
         }
 
-        ~DARKSOULS()
+        ~DarkSoulsTrackerComponant()
         {
             _state.OnStart -= gameMemory_OnStart;
             _state.OnReset -= gameMemory_OnReset;
@@ -61,14 +60,14 @@ namespace Livesplit.DarkSoulsTracker
 
         private void gameMemory_OnStart(object sender, EventArgs e)
         {
-            //MessageBox.Show("OnStart");
-            _gameMemory.StartReading();
+            if (_gameMemory != null)
+                _gameMemory.StartReading();
         }
 
         private void gameMemory_OnReset(object sender, TimerPhase value)
         {
-            //MessageBox.Show("OnReset");
-            _gameMemory.Stop();
+            if (_gameMemory != null)
+                _gameMemory.Stop();
         }
 
         void gameMemory_UpdatePercentage(object sender, EventArgs e)
