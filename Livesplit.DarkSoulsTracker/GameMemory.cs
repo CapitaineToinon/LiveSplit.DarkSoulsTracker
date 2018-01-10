@@ -81,6 +81,7 @@ namespace Livesplit.DarkSoulsTracker
         {
             bool hooked = false;
             bool needsRehooking = false;
+            bool rehookedAndWaiting = false;
             bool completed = false;
             Game = new Game(this);
 
@@ -95,6 +96,7 @@ namespace Livesplit.DarkSoulsTracker
                 {
                     unhook();
                     hooked = needsRehooking = false;
+                    rehookedAndWaiting = true;
                 }
 
                 // Hooks the game if needed
@@ -144,14 +146,14 @@ namespace Livesplit.DarkSoulsTracker
 
                             // Everytime the player enters a loadscreen, the hook gets disconnected and reconnected
                             // If IGT returns 0, the player is in the main menu. Disconnecting in the main menu may lead to the game freezing
-                            if (CurrentIGT == NextIGT)
+                            if ((CurrentIGT == NextIGT) && !rehookedAndWaiting)
                             {
-                                Thread.Sleep(200);
                                 needsRehooking = true;
-                            }
+                            } 
                             // If the player is in his own world or not at the main menu
                             else if (Game.isPlayerInOwnWorld() && Game.IsPlayerLoaded() && Game.GetIngameTimeInMilliseconds() != 0)
                             {
+                                rehookedAndWaiting = true;
                                 // Updates all the flags and calls the event to update the UI
                                 Game.updateAllEventFlags();
                                 this.UpdatePercentage(Game.GetTotalCompletionPercentage, EventArgs.Empty);
@@ -178,7 +180,7 @@ namespace Livesplit.DarkSoulsTracker
             Kernel.VirtualProtectEx(_targetProcessHandle, hook1mem, (UIntPtr)0x8000, Constants.PAGE_EXECUTE_READWRITE, out uint oldProtectionOut);
 
             // Using DarkSoulsFlagsInjector.dll, the VB code memes by Wulf :thinking:
-            DarkSoulsFlagsInjector.DarkSoulsFlagsInjector a = new DarkSoulsFlagsInjector.DarkSoulsFlagsInjector();
+            CodeToAssembly a = new CodeToAssembly();
 
             a.AddVar("hook", hooks["hook1"]);
             a.AddVar("newmem", hook1mem);
@@ -207,14 +209,14 @@ namespace Livesplit.DarkSoulsTracker
             a.Asm($"call 0x" + hooks["hook1seteventflag"].ToString("X" /* X = Hexadecimal */));
             a.Asm("jmp hookreturn");
 
-            WriteCodeAndFlushCache(_targetProcessHandle, hook1mem, a.bytes, a.bytes.Length, 0);
-
+            WriteCodeAndFlushCache(_targetProcessHandle, hook1mem, a.Bytes, a.Bytes.Length, 0);
+            
             a.Clear();
             a.AddVar("newmem", hook1mem);
             a.pos = hooks["hook1"].ToInt32();
             a.Asm("jmp newmem");
 
-            WriteCodeAndFlushCache(_targetProcessHandle, hooks["hook1"], a.bytes, a.bytes.Length, 0);
+            WriteCodeAndFlushCache(_targetProcessHandle, hooks["hook1"], a.Bytes, a.Bytes.Length, 0);
         }
 
         private void initGetFlagFunc()
@@ -223,7 +225,8 @@ namespace Livesplit.DarkSoulsTracker
             Kernel.VirtualProtectEx(_targetProcessHandle, getflagfuncmem, (UIntPtr)0x8000, Constants.PAGE_EXECUTE_READWRITE, out uint oldProtectionOut);
 
             // Using DarkSoulsFlagsInjector.dll, the VB code memes by Wulf :thinking:
-            DarkSoulsFlagsInjector.DarkSoulsFlagsInjector a = new DarkSoulsFlagsInjector.DarkSoulsFlagsInjector();
+            // DarkSoulsFlagsInjector.DarkSoulsFlagsInjector a = new DarkSoulsFlagsInjector.DarkSoulsFlagsInjector();
+            CodeToAssembly a = new CodeToAssembly();
 
             a.AddVar("newmem", getflagfuncmem);
             a.AddVar("vardump", getflagfuncmem + 0x400);
@@ -243,7 +246,7 @@ namespace Livesplit.DarkSoulsTracker
             a.Asm("popad");
             a.Asm("ret");
 
-            WriteCodeAndFlushCache(_targetProcessHandle, getflagfuncmem, a.bytes, a.bytes.Length, 0);
+            WriteCodeAndFlushCache(_targetProcessHandle, getflagfuncmem, a.Bytes, a.Bytes.Length, 0);
         }
 
         private bool WriteCodeAndFlushCache(IntPtr hProcess, IntPtr lpBaseAddress, Byte[] lpBuffer, int iSize, int lpNumberOfBytesWritten)
