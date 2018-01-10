@@ -153,7 +153,7 @@ namespace Livesplit.DarkSoulsTracker
                             // If the player is in his own world or not at the main menu
                             else if (Game.isPlayerInOwnWorld() && Game.IsPlayerLoaded() && Game.GetIngameTimeInMilliseconds() != 0)
                             {
-                                rehookedAndWaiting = true;
+                                rehookedAndWaiting = false;
                                 // Updates all the flags and calls the event to update the UI
                                 Game.updateAllEventFlags();
                                 this.UpdatePercentage(Game.GetTotalCompletionPercentage, EventArgs.Empty);
