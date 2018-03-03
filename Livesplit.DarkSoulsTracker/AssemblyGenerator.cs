@@ -1,12 +1,15 @@
-﻿using System;
+﻿/**
+ * Magic code original made in Visual Basic by Wulf2k : 
+ * https://github.com/Wulf2k/DS-EventHook/blob/master/DS-EventHook/asm.vb
+ * Converts Assembly code to raw bytes
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Livesplit.DarkSoulsTracker
+namespace Livesplit.DarkSouls100PercentTracker
 {
-    class CodeToAssembly
+    class AssemblyGenerator
     {
         private byte[] bytes;
         public Int32 pos;
@@ -21,7 +24,7 @@ namespace Livesplit.DarkSoulsTracker
 
         private SortedList<int, string> varrefs;
 
-        public CodeToAssembly()
+        public AssemblyGenerator()
         {
             bytes = new byte[] { };
             pos = 0;

@@ -1,4 +1,4 @@
-﻿namespace Livesplit.DarkSoulsTracker
+﻿namespace Livesplit.DarkSouls100PercentTracker
 {
     static class Flags
     {
@@ -73,7 +73,7 @@
                                                     11000120, 11010191, 11010192, 11010172, 11100120, 11210650 //Locked doors end here
                                                     };
         static public int[] TotalIllusoryWallsFlags = {11200120, 11300160, 11320200, 11320201, 11400210, 11510215, 11510401, 11410360, 11310100, 11210200,
-                                            11210201, 11210346, 11210025};
+                                            11210201, 11210346, 11210025, 11600091 };
         static public int[] TotalFoggatesFlags = {11510090, 11510091, 11810090, 11010090, 11300090, 11310090, 11400091, 11500090, 11500091, 11010091,
                                         11320090, 11000090, 11200090, 11700083, 11100091, 11600090};
         static public int[] TotalBonfireFlags = {1801960, 1601961, 1601950, 1021960, 1301961, 1301960, 1011964, 1011962, 1011961, 1811961,

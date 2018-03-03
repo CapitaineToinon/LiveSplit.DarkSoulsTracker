@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("Livesplit.DarkSoulsTracker")]
+[assembly: AssemblyTitle("Livesplit.DarkSouls100PercentTracker")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Livesplit.DarkSoulsTracker")]
+[assembly: AssemblyProduct("Livesplit.DarkSouls100PercentTracker")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM
-[assembly: Guid("c9a7f4ea-45c1-49da-8e22-686dfdd954c1")]
+[assembly: Guid("fa15f8bb-5b75-42a1-98e6-a8471c8a101e")]
 
 // Les informations de version pour un assembly se composent des quatre valeurs suivantes :
 //

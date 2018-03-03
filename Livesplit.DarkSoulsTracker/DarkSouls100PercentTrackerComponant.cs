@@ -5,17 +5,50 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Globalization;
 using LiveSplit.TimeFormatters;
 using System.Drawing.Drawing2D;
 
-namespace Livesplit.DarkSoulsTracker.UI
+namespace Livesplit.DarkSouls100PercentTracker
 {
     public class DarkSoulsTrackerUIComponant : IComponent
     {
         protected InfoTextComponent InternalComponent { get; set; }
-        public DarkSoulsTrackerUISettings Settings { get; set; }
+        public DarkSouls100PercentTrackerSettings Settings{ get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
+
+        private LiveSplitState _state;
+        private Tracker tracker;
+        private DetailedView detailedView;
+
+        private double _percentage = -1;
+        private string _percentageString
+        {
+            get
+            {
+                if (_percentage == -1)
+                {
+                    return "-";
+                } 
+                else if (Settings.Accuracy == TimeAccuracy.Seconds)
+                {
+                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString());
+                }
+                else if (Settings.Accuracy == TimeAccuracy.Tenths)
+                {
+                    double tmp = _percentage * 10;
+                    tmp = Math.Truncate(tmp);
+                    tmp = tmp / 10;
+                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString("0.0"));
+                }
+                else
+                {
+                    double tmp = _percentage * 100;
+                    tmp = Math.Truncate(tmp);
+                    tmp = tmp / 100;
+                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString("0.00"));
+                }
+            }
+        }
 
         public float PaddingTop => InternalComponent.PaddingTop;
         public float PaddingLeft => InternalComponent.PaddingLeft;
@@ -26,84 +59,85 @@ namespace Livesplit.DarkSoulsTracker.UI
 
         public DarkSoulsTrackerUIComponant(LiveSplitState state)
         {
-            Settings = new DarkSoulsTrackerUISettings()
+            Settings = new DarkSouls100PercentTrackerSettings()
             {
                 CurrentState = state
             };
+            Settings.OnToggleDetails += Settings_OnToggleDetails;
 
             this.InternalComponent = new InfoTextComponent("Progression", "-");
+
+            tracker = new Tracker();
+            tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
 
             _state = state;
             _state.OnReset += _state_OnReset;
             _state.OnStart += _state_OnStart;
         }
 
+        private void Settings_OnToggleDetails(object sender, EventArgs e)
+        {
+            if (detailedView == null)
+            {
+                detailedView = new DetailedView();
+                detailedView.OnClosed += DetailedView_OnClosed;
+                detailedView.Show();
+            } else
+            {
+                detailedView.Close();
+                detailedView = null;
+            }
+        }
+
+        private void DetailedView_OnClosed(object sender, EventArgs e)
+        {
+            detailedView.OnClosed -= DetailedView_OnClosed;
+            detailedView = null;
+        }
+
+        private void Tracker_PercentageUpdated(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(Tracker))
+            {
+                Tracker t = (Tracker)sender;
+                _percentage = t.TotalPercentage;
+
+                if (detailedView != null)
+                {
+                    detailedView.DefeatedBossesCount                    = t.DefeatedBossesCount;             
+                    detailedView.ItemsPickedUp                          = t.ItemsPickedUp;
+                    detailedView.DissolvedFoggatesCount                 = t.DissolvedFoggatesCount;
+                    detailedView.RevealedIllusoryWallsCount             = t.RevealedIllusoryWallsCount;
+                    detailedView.UnlockedShortcutsAndLockedDoorsCount   = t.UnlockedShortcutsAndLockedDoorsCount;
+                    detailedView.CompletedQuestlinesCount               = t.CompletedQuestlinesCount;
+                    detailedView.KilledNonRespawningEnemiesCount        = t.KilledNonRespawningEnemiesCount;
+                    detailedView.FullyKindledBonfires                   = t.FullyKindledBonfires;
+                    detailedView.Percentage                             = _percentageString;
+                }
+            }
+        }
+
         public string ComponentName
         {
-            get { return "Dark Souls 100% Tracker UI"; }
+            get { return "Dark Souls 100% Tracker"; }
         }
-
-        private LiveSplitState _state;
-        private string debugState;
-        private double _percentage = -1;
-        private string _percentageString
-        {
-            get
-            {
-                if (_percentage == -1)
-                    return "-";
-                else
-                    if (Settings.Accuracy == TimeAccuracy.Seconds)
-                    
-                        return string.Format("{0}%", MathFloorWithPrecision(_percentage, 0).ToString(CultureInfo.InvariantCulture));
-                    else if (Settings.Accuracy == TimeAccuracy.Tenths)
-                        return string.Format("{0}%", MathFloorWithPrecision(_percentage, 1).ToString(CultureInfo.InvariantCulture));
-                    else
-                        return string.Format("{0}%", MathFloorWithPrecision(_percentage, 2).ToString(CultureInfo.InvariantCulture));
-            }
-        }
-
-        // Function made to floor the percentage but with decimals
-        // Can't use Math.Round to avoid, for example, getting 99.9% rounded up to 100%
-        // TODO : Fix the format so 0% is displayed at 0.0% or 0.00% etc
-        private double MathFloorWithPrecision(double value, int precision)
-        {
-            switch (precision)
-            {
-                default:
-                case 0:
-                    return Math.Floor(value);
-                case 1:
-                    return (Math.Floor(value * 10)) / 10;
-                case 2:
-                    return (Math.Floor(value * 20)) / 20;
-            }
-        }
-
-        public void DebugState(string s)
-        {
-            debugState = s;
-        } 
 
         private void _state_OnStart(object sender, EventArgs e)
         {
             _percentage = 0;
+            tracker.Start();
         }
 
         void _state_OnReset(object sender, TimerPhase t)
         {
             _percentage = -1;
+            tracker.Stop();
         }
 
         public void Dispose()
         {
             _state.OnReset -= _state_OnReset;
             _state.OnStart -= _state_OnStart;
-        }
-
-        public void UpdatePercentage(double p)
-        {
-            _percentage = p;
         }
 
         public void DrawVertical(Graphics g, LiveSplitState state, float width, Region region)
@@ -180,6 +214,6 @@ namespace Livesplit.DarkSoulsTracker.UI
         public float MinimumWidth { get { return this.InternalComponent.MinimumWidth; } }
         public float MinimumHeight { get { return this.InternalComponent.MinimumHeight; } }
         public float VerticalHeight { get { return this.InternalComponent.VerticalHeight; } }
-        public float HorizontalWidth { get { return this.InternalComponent.HorizontalWidth; } }   
+        public float HorizontalWidth { get { return this.InternalComponent.HorizontalWidth; } }
     }
 }

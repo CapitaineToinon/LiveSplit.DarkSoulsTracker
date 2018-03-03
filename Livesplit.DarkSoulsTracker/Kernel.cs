@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Livesplit.DarkSoulsTracker
+namespace Livesplit.DarkSouls100PercentTracker
 {
     static class Kernel
     {

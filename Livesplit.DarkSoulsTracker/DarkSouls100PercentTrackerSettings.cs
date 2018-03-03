@@ -1,4 +1,5 @@
-﻿using LiveSplit.Model;
+﻿
+using LiveSplit.Model;
 using LiveSplit.Model.Comparisons;
 using LiveSplit.TimeFormatters;
 using LiveSplit.UI;
@@ -8,10 +9,12 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Livesplit.DarkSoulsTracker.UI
+namespace Livesplit.DarkSouls100PercentTracker
 {
-    public partial class DarkSoulsTrackerUISettings : UserControl
+    public partial class DarkSouls100PercentTrackerSettings : UserControl
     {
+        public event EventHandler OnToggleDetails;
+
         public Color TextColor { get; set; }
         public bool OverrideTextColor { get; set; }
         public TimeAccuracy Accuracy { get; set; }
@@ -30,7 +33,7 @@ namespace Livesplit.DarkSoulsTracker.UI
 
         public LayoutMode Mode { get; set; }
 
-        public DarkSoulsTrackerUISettings()
+        public DarkSouls100PercentTrackerSettings()
         {
             InitializeComponent();
 
@@ -142,6 +145,12 @@ namespace Livesplit.DarkSoulsTracker.UI
         {
             SettingsHelper.ColorButtonClick((Button)sender, this);
         }
+
+        private void btnDetails_Click(object sender, EventArgs e)
+        {
+            this.OnToggleDetails(sender, EventArgs.Empty);
+        }
     }
 }
+
 

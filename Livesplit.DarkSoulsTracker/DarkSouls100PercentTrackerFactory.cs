@@ -1,18 +1,18 @@
 ﻿using System.Reflection;
-using Livesplit.DarkSoulsTracker.UI;
 using LiveSplit.UI.Components;
 using System;
 using LiveSplit.Model;
+using Livesplit.DarkSouls100PercentTracker;
 
-[assembly: ComponentFactory(typeof(DarkSoulsTrackerUIFactory))]
+[assembly: ComponentFactory(typeof(DarkSouls100PercentTrackerFactory))]
 
-namespace Livesplit.DarkSoulsTracker.UI
+namespace Livesplit.DarkSouls100PercentTracker
 {
-    class DarkSoulsTrackerUIFactory : IComponentFactory
+    class DarkSouls100PercentTrackerFactory : IComponentFactory
     {
         public string ComponentName
         {
-            get { return "Dark Souls 100% UI"; }
+            get { return "Dark Souls 100% Tracker"; }
         }
 
         public string Description
