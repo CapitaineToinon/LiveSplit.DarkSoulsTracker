@@ -55,7 +55,7 @@
             this.treasureLocationsValueLabel.Name = "treasureLocationsValueLabel";
             this.treasureLocationsValueLabel.Size = new System.Drawing.Size(28, 15);
             this.treasureLocationsValueLabel.TabIndex = 4;
-            this.treasureLocationsValueLabel.Text = "0/0";
+            this.treasureLocationsValueLabel.Text = "0/1";
             // 
             // bossesKilledValueLabel
             // 
@@ -64,7 +64,7 @@
             this.bossesKilledValueLabel.Name = "bossesKilledValueLabel";
             this.bossesKilledValueLabel.Size = new System.Drawing.Size(28, 15);
             this.bossesKilledValueLabel.TabIndex = 5;
-            this.bossesKilledValueLabel.Text = "0/0";
+            this.bossesKilledValueLabel.Text = "0/1";
             // 
             // nonRespawningEnemiesValueLabel
             // 
@@ -73,7 +73,7 @@
             this.nonRespawningEnemiesValueLabel.Name = "nonRespawningEnemiesValueLabel";
             this.nonRespawningEnemiesValueLabel.Size = new System.Drawing.Size(28, 15);
             this.nonRespawningEnemiesValueLabel.TabIndex = 6;
-            this.nonRespawningEnemiesValueLabel.Text = "0/0";
+            this.nonRespawningEnemiesValueLabel.Text = "0/1";
             // 
             // npcQuestlinesValueLabel
             // 
@@ -82,7 +82,7 @@
             this.npcQuestlinesValueLabel.Name = "npcQuestlinesValueLabel";
             this.npcQuestlinesValueLabel.Size = new System.Drawing.Size(28, 15);
             this.npcQuestlinesValueLabel.TabIndex = 7;
-            this.npcQuestlinesValueLabel.Text = "0/0";
+            this.npcQuestlinesValueLabel.Text = "0/1";
             // 
             // shortcutsValueLabel
             // 
@@ -91,7 +91,7 @@
             this.shortcutsValueLabel.Name = "shortcutsValueLabel";
             this.shortcutsValueLabel.Size = new System.Drawing.Size(28, 15);
             this.shortcutsValueLabel.TabIndex = 8;
-            this.shortcutsValueLabel.Text = "0/0";
+            this.shortcutsValueLabel.Text = "0/1";
             // 
             // illusoryWallsValueLabel
             // 
@@ -100,7 +100,7 @@
             this.illusoryWallsValueLabel.Name = "illusoryWallsValueLabel";
             this.illusoryWallsValueLabel.Size = new System.Drawing.Size(28, 15);
             this.illusoryWallsValueLabel.TabIndex = 9;
-            this.illusoryWallsValueLabel.Text = "0/0";
+            this.illusoryWallsValueLabel.Text = "0/1";
             // 
             // foggatesValueLabel
             // 
@@ -109,7 +109,7 @@
             this.foggatesValueLabel.Name = "foggatesValueLabel";
             this.foggatesValueLabel.Size = new System.Drawing.Size(28, 15);
             this.foggatesValueLabel.TabIndex = 10;
-            this.foggatesValueLabel.Text = "0/0";
+            this.foggatesValueLabel.Text = "0/1";
             // 
             // bonfiresValueLabel
             // 
@@ -118,7 +118,7 @@
             this.bonfiresValueLabel.Name = "bonfiresValueLabel";
             this.bonfiresValueLabel.Size = new System.Drawing.Size(28, 15);
             this.bonfiresValueLabel.TabIndex = 11;
-            this.bonfiresValueLabel.Text = "0/0";
+            this.bonfiresValueLabel.Text = "0/1";
             // 
             // label1
             // 

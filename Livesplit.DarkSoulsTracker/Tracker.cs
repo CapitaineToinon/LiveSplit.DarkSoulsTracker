@@ -34,7 +34,15 @@ namespace Livesplit.DarkSouls100PercentTracker
     class Tracker
     {
         #region Variables and properties
-        private bool IsAlreadyRunning = false;
+        private bool IsRunning = false;
+
+        public bool IsThreadRunning
+        {
+            get
+            {
+                return IsRunning;
+            }
+        }
 
         public event EventHandler OnPercentageUpdated;
         private CancellationTokenSource MainThreadToken;
@@ -410,7 +418,7 @@ namespace Livesplit.DarkSouls100PercentTracker
             if (ptr == IntPtr.Zero)
                 return -1;
             else
-                return MemoryTools.RInt32(DARKSOULSHandle, ptr + 0x32);
+                return MemoryTools.RInt32(DARKSOULSHandle, IntPtr.Add(ptr, 0x3C));
         }
 
         private bool GetEventFlagState(int eventID)
@@ -685,9 +693,9 @@ namespace Livesplit.DarkSouls100PercentTracker
         public async void Start()
         {
             MainThreadToken = new CancellationTokenSource();
-            if (!IsAlreadyRunning)
+            if (!IsRunning)
             {
-                IsAlreadyRunning = true;
+                IsRunning = true;
                 await Task.Factory.StartNew(() =>
                 {
                     bool needsRehooking = false;
@@ -781,12 +789,25 @@ namespace Livesplit.DarkSouls100PercentTracker
                     }
 
                     // Thread has been canceled, unhooks before leaving
-                    IsAlreadyRunning = false;
+                    IsRunning = false;
                     if (IsHooked)
                     {
                         //Console.WriteLine("Thread stopped.");
                         UnHook();
                     }
+
+                    // Clears the view
+                    defeatedBossesCount =
+                    itemsPickedUp =
+                    dissolvedFoggatesCount =
+                    revealedIllusoryWallsCount =
+                    unlockedShortcutsAndLockedDoorsCount =
+                    completedQuestlinesCount =
+                    killedNonRespawningEnemiesCount =
+                    fullyKindledBonfires = new int[] { 0, 1 };
+
+                    update_totalPercentage();
+                    this.OnPercentageUpdated(this, EventArgs.Empty);
                 });
             }
             else

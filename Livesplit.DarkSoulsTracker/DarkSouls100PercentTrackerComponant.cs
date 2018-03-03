@@ -25,7 +25,7 @@ namespace Livesplit.DarkSouls100PercentTracker
         {
             get
             {
-                if (_percentage == -1)
+                if (_percentage == -1 || !tracker.IsThreadRunning)
                 {
                     return "-";
                 } 
@@ -35,17 +35,13 @@ namespace Livesplit.DarkSouls100PercentTracker
                 }
                 else if (Settings.Accuracy == TimeAccuracy.Tenths)
                 {
-                    double tmp = _percentage * 10;
-                    tmp = Math.Truncate(tmp);
-                    tmp = tmp / 10;
-                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString("0.0"));
+                    double tmp = Math.Truncate(_percentage * 10);
+                    return string.Format("{0}%", (tmp / 10).ToString("0.0"));
                 }
                 else
                 {
-                    double tmp = _percentage * 100;
-                    tmp = Math.Truncate(tmp);
-                    tmp = tmp / 100;
-                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString("0.00"));
+                    double tmp = Math.Truncate(_percentage * 100);
+                    return string.Format("{0}%", (tmp / 100).ToString("0.00"));
                 }
             }
         }
@@ -130,8 +126,8 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         void _state_OnReset(object sender, TimerPhase t)
         {
-            _percentage = -1;
             tracker.Stop();
+            _percentage = -1;
         }
 
         public void Dispose()
