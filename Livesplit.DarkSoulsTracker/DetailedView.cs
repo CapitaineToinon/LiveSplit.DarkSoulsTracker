@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiveSplit.UI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,88 +15,159 @@ namespace Livesplit.DarkSouls100PercentTracker
     {
         public new event EventHandler OnClosed;
 
-        private int[] defeatedBossesCount;
-        private int[] itemsPickedUp;
-        private int[] dissolvedFoggatesCount;
-        private int[] fullyKindledBonfires;
-        private int[] revealedIllusoryWallsCount;
-        private int[] unlockedShortcutsAndLockedDoorsCount;
-        private int[] completedQuestlinesCount;
-        private int[] killedNonRespawningEnemiesCount;
-        private string percentage;
+        private int[] defeatedBossesCount = new int[] { 0, 1 };
+        private int[] itemsPickedUp = new int[] { 0, 1 };
+        private int[] dissolvedFoggatesCount = new int[] { 0, 1 };
+        private int[] fullyKindledBonfires = new int[] { 0, 1 };
+        private int[] revealedIllusoryWallsCount = new int[] { 0, 1 };
+        private int[] unlockedShortcutsAndLockedDoorsCount = new int[] { 0, 1 };
+        private int[] completedQuestlinesCount = new int[] { 0, 1 };
+        private int[] killedNonRespawningEnemiesCount = new int[] { 0, 1 };
+        private string percentage = "-";
+
+        public Color BackgroundColor
+        {
+            set
+            {
+                if (TrackerDataGrid != null)
+                {
+                    TrackerDataGrid.BackgroundColor = value;
+                    TrackerDataGrid.RowsDefaultCellStyle.BackColor = value;
+                    TrackerDataGrid.RowsDefaultCellStyle.SelectionBackColor = value;
+                }
+            }
+        }
+
+        public SimpleLabel TextFont
+        {
+            set
+            {
+                if (TrackerDataGrid != null)
+                {
+                    TrackerDataGrid.Columns["name"].DefaultCellStyle.Font = value.Font;
+                    TrackerDataGrid.Columns["name"].DefaultCellStyle.ForeColor = value.ForeColor;
+                }
+            }
+        }
+
+        public SimpleLabel TimesFont
+        {
+            set
+            {
+                if (TrackerDataGrid != null)
+                {
+                    TrackerDataGrid.Columns["count"].DefaultCellStyle.Font = value.Font;
+                    TrackerDataGrid.Columns["count"].DefaultCellStyle.ForeColor = value.ForeColor;
+
+                }
+            }
+        }
 
         public DetailedView()
         {
             InitializeComponent();
+
+            // Datagrid formatting
+            TrackerDataGrid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TrackerDataGrid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            TrackerDataGrid.Columns["count"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            TrackerDataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+
+            UpdateDataGridView();
+
+            this.Height = TrackerDataGrid.Height;
         }
 
-        private void FormatLabel(Label l, int[] val)
+        private void UpdateDataGridView()
         {
-            l.Text = string.Format("{0}/{1}", val[0], val[1]);
+            TrackerDataGrid.Rows.Clear();
+            string[] row0 = { "Treasure Locations", FormatString(itemsPickedUp) };
+            string[] row1 = { "Bosses", FormatString(defeatedBossesCount) };
+            string[] row2 = { "Non-respawning Enemies", FormatString(killedNonRespawningEnemiesCount) };
+            string[] row3 = { "NPC Questlines", FormatString(completedQuestlinesCount) };
+            string[] row4 = { "Shortcuts / Locked Doors", FormatString(unlockedShortcutsAndLockedDoorsCount) };
+            string[] row5 = { "Illusory Walls", FormatString(revealedIllusoryWallsCount) };
+            string[] row6 = { "Foggates", FormatString(dissolvedFoggatesCount) };
+            string[] row7 = { "Kindled Bonfires", FormatString(fullyKindledBonfires) };
+            string[] row8 = { "Progression", percentage };
+
+            TrackerDataGrid.Rows.Add(row0);
+            TrackerDataGrid.Rows.Add(row1);
+            TrackerDataGrid.Rows.Add(row2);
+            TrackerDataGrid.Rows.Add(row3);
+            TrackerDataGrid.Rows.Add(row4);
+            TrackerDataGrid.Rows.Add(row5);
+            TrackerDataGrid.Rows.Add(row6);
+            TrackerDataGrid.Rows.Add(row7);
+            TrackerDataGrid.Rows.Add(row8);
+        }
+
+        private string FormatString(int[] val)
+        {
+            if (val == null)
+                val = new int[] { 0, 1 };
+
+            return string.Format("{0}/{1}", val[0], val[1]);
         }
 
         public int[] DefeatedBossesCount { get => defeatedBossesCount;
             set
             {
-                defeatedBossesCount = value;
-                FormatLabel(bossesKilledValueLabel, defeatedBossesCount);
+                 defeatedBossesCount = value;
             }
         }
         public int[] ItemsPickedUp { get => itemsPickedUp;
             set
             {
                 itemsPickedUp = value;
-                FormatLabel(treasureLocationsValueLabel, itemsPickedUp);
             }
         }
         public int[] DissolvedFoggatesCount { get => dissolvedFoggatesCount;
             set
             {
                 dissolvedFoggatesCount = value;
-                FormatLabel(foggatesValueLabel, dissolvedFoggatesCount);
             }
         }
         public int[] FullyKindledBonfires { get => fullyKindledBonfires;
             set
             {
                 fullyKindledBonfires = value;
-                FormatLabel(bonfiresValueLabel, fullyKindledBonfires);
             }
         }
         public int[] RevealedIllusoryWallsCount { get => revealedIllusoryWallsCount;
             set
             {
                 revealedIllusoryWallsCount = value;
-                FormatLabel(illusoryWallsValueLabel, revealedIllusoryWallsCount);
             }
         }
         public int[] UnlockedShortcutsAndLockedDoorsCount { get => unlockedShortcutsAndLockedDoorsCount;
             set
             {
                 unlockedShortcutsAndLockedDoorsCount = value;
-                FormatLabel(shortcutsValueLabel, unlockedShortcutsAndLockedDoorsCount);
             }
         }
         public int[] CompletedQuestlinesCount { get => completedQuestlinesCount;
             set
             {
                 completedQuestlinesCount = value;
-                FormatLabel(npcQuestlinesValueLabel, completedQuestlinesCount);
             }
         }
         public int[] KilledNonRespawningEnemiesCount { get => killedNonRespawningEnemiesCount;
             set
             {
                 killedNonRespawningEnemiesCount = value;
-                FormatLabel(nonRespawningEnemiesValueLabel, killedNonRespawningEnemiesCount);
             }
         }
 
         public string Percentage { get => percentage;
             set
             {
-                percentage = value;
-                percentageLabel.Text = percentage;
+                // Only updates the UI if the percentage changed, to avoid flickering
+                if (value != percentage)
+                {
+                    percentage = value;
+                    UpdateDataGridView();
+                }
             }
         }
 

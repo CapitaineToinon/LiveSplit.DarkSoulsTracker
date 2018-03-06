@@ -13,7 +13,7 @@ namespace Livesplit.DarkSouls100PercentTracker
     public class DarkSoulsTrackerUIComponant : IComponent
     {
         protected InfoTextComponent InternalComponent { get; set; }
-        public DarkSouls100PercentTrackerSettings Settings{ get; set; }
+        public DarkSouls100PercentTrackerSettings Settings { get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
 
         private LiveSplitState _state;
@@ -62,6 +62,8 @@ namespace Livesplit.DarkSouls100PercentTracker
             Settings.OnToggleDetails += Settings_OnToggleDetails;
 
             this.InternalComponent = new InfoTextComponent("Progression", "-");
+            
+            
 
             tracker = new Tracker();
             tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
@@ -71,11 +73,22 @@ namespace Livesplit.DarkSouls100PercentTracker
             _state.OnStart += _state_OnStart;
         }
 
+        private void Settings_FontChanged(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void Settings_OnToggleDetails(object sender, EventArgs e)
         {
             if (detailedView == null)
             {
-                detailedView = new DetailedView();
+                detailedView = new DetailedView
+                {
+                    TextFont = InternalComponent.NameLabel,
+                    // TODO : Font not working
+                    TimesFont = InternalComponent.ValueLabel,
+                };
+
                 detailedView.OnClosed += DetailedView_OnClosed;
                 detailedView.Show();
             } else
@@ -100,15 +113,20 @@ namespace Livesplit.DarkSouls100PercentTracker
 
                 if (detailedView != null)
                 {
-                    detailedView.DefeatedBossesCount                    = t.DefeatedBossesCount;             
-                    detailedView.ItemsPickedUp                          = t.ItemsPickedUp;
-                    detailedView.DissolvedFoggatesCount                 = t.DissolvedFoggatesCount;
-                    detailedView.RevealedIllusoryWallsCount             = t.RevealedIllusoryWallsCount;
-                    detailedView.UnlockedShortcutsAndLockedDoorsCount   = t.UnlockedShortcutsAndLockedDoorsCount;
-                    detailedView.CompletedQuestlinesCount               = t.CompletedQuestlinesCount;
-                    detailedView.KilledNonRespawningEnemiesCount        = t.KilledNonRespawningEnemiesCount;
-                    detailedView.FullyKindledBonfires                   = t.FullyKindledBonfires;
-                    detailedView.Percentage                             = _percentageString;
+                    detailedView.DefeatedBossesCount = t.DefeatedBossesCount;
+                    detailedView.ItemsPickedUp = t.ItemsPickedUp;
+                    detailedView.DissolvedFoggatesCount = t.DissolvedFoggatesCount;
+                    detailedView.RevealedIllusoryWallsCount = t.RevealedIllusoryWallsCount;
+                    detailedView.UnlockedShortcutsAndLockedDoorsCount = t.UnlockedShortcutsAndLockedDoorsCount;
+                    detailedView.CompletedQuestlinesCount = t.CompletedQuestlinesCount;
+                    detailedView.KilledNonRespawningEnemiesCount = t.KilledNonRespawningEnemiesCount;
+                    detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
+                    detailedView.Percentage = _percentageString;
+
+                    detailedView.TextFont = InternalComponent.NameLabel;
+                    // TODO : Font not working
+                    detailedView.TimesFont = InternalComponent.ValueLabel;
+                    detailedView.BackgroundColor = _state.LayoutSettings.BackgroundColor;
                 }
             }
         }
@@ -185,6 +203,10 @@ namespace Livesplit.DarkSouls100PercentTracker
 
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
             InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
+
+            InternalComponent.NameLabel.Font = _state.LayoutSettings.TextFont;
+            // TODO : Font not working
+            InternalComponent.ValueLabel.Font = state.LayoutSettings.TimesFont;
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
