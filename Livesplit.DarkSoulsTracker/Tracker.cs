@@ -29,6 +29,8 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         // 2 frames at 30 FPS
         public const int Thread_Frequency = 33;
+
+        public const int BONFIRE_FULLY_KINDLED = 40;
     }
 
     class Tracker
@@ -268,18 +270,14 @@ namespace Livesplit.DarkSouls100PercentTracker
             //  'Bonfires accessible in this way are only the ones the player has been able to access at some point
             //  'Once it reaches the end of the list, the bonfireID is 0 and then it loops back around
             //  'So reaching bonfireID = 0 means the loop has to end
-            for (int i = 0; i < Flags.TotalBonfireFlags.Length; i++)
+            int bonfireID = 0;
+            do
             {
                 IntPtr bonfirePtr = (IntPtr)MemoryTools.RInt32(DARKSOULSHandle, ptr + 8);
-                int bonfireID = MemoryTools.RInt32(DARKSOULSHandle, bonfirePtr + 4);
-
-                if (bonfireID == 0)
-                {
-                    return;
-                }
+                bonfireID = MemoryTools.RInt32(DARKSOULSHandle, bonfirePtr + 4);
 
                 int kindledState = MemoryTools.RInt32(DARKSOULSHandle, bonfirePtr + 8);
-                if (kindledState == 40)
+                if (kindledState == Constants.BONFIRE_FULLY_KINDLED)
                 {
                     kindledBonfires++;
                 }
@@ -296,12 +294,18 @@ namespace Livesplit.DarkSouls100PercentTracker
                         kindledBonfires++;
                     }
                 }
+
                 ptr = (IntPtr)MemoryTools.RInt32(DARKSOULSHandle, ptr); // Go one step deeper in the struct
-            }
+            } while (bonfireID != 0);
+
+            // We use Flags.TotalBonfireFlags.Length to get the total amount of bonfires because
+            // the memory we're looking at in the while loop only contains the bonfires from the
+            // areas we've already visited
             fullyKindledBonfires = new int[]
             {
                 kindledBonfires, Flags.TotalBonfireFlags.Length
             };
+
         }
         private void update_totalPercentage()
         {

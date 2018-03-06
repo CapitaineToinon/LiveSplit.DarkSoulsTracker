@@ -37,18 +37,12 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LiveSplit.Core">
-      <HintPath>..\..\Livesplit\LiveSplit\LiveSplit.Core\obj\Debug\LiveSplit.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="UpdateManager">
-      <HintPath>..\..\Livesplit\LiveSplit\UpdateManager\obj\Debug\UpdateManager.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyGenerator.cs" />

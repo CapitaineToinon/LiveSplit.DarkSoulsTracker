@@ -134,6 +134,12 @@ namespace Livesplit.DarkSouls100PercentTracker
         {
             _state.OnReset -= _state_OnReset;
             _state.OnStart -= _state_OnStart;
+
+            if (detailedView != null)
+            {
+                detailedView.Close();
+                detailedView = null;
+            }
         }
 
         public void DrawVertical(Graphics g, LiveSplitState state, float width, Region region)
