@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DetailedView));
             this.TrackerDataGrid = new System.Windows.Forms.DataGridView();
             this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -41,40 +39,28 @@
             // 
             this.TrackerDataGrid.AllowUserToAddRows = false;
             this.TrackerDataGrid.AllowUserToDeleteRows = false;
-            this.TrackerDataGrid.AllowUserToOrderColumns = true;
-            this.TrackerDataGrid.AllowUserToResizeColumns = false;
-            this.TrackerDataGrid.AllowUserToResizeRows = false;
-            this.TrackerDataGrid.BackgroundColor = System.Drawing.Color.Black;
             this.TrackerDataGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TrackerDataGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.TrackerDataGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            this.TrackerDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.TrackerDataGrid.ColumnHeadersVisible = false;
             this.TrackerDataGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.name,
             this.count});
-            this.TrackerDataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TrackerDataGrid.GridColor = System.Drawing.SystemColors.Desktop;
+            this.TrackerDataGrid.Dock = System.Windows.Forms.DockStyle.Top;
             this.TrackerDataGrid.Location = new System.Drawing.Point(0, 0);
             this.TrackerDataGrid.MultiSelect = false;
             this.TrackerDataGrid.Name = "TrackerDataGrid";
             this.TrackerDataGrid.ReadOnly = true;
-            this.TrackerDataGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TrackerDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.TrackerDataGrid.RowHeadersVisible = false;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White;
-            this.TrackerDataGrid.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.TrackerDataGrid.Size = new System.Drawing.Size(296, 303);
-            this.TrackerDataGrid.TabIndex = 1;
+            this.TrackerDataGrid.RowTemplate.DefaultCellStyle.BackColor = System.Drawing.Color.White;
+            this.TrackerDataGrid.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.Black;
+            this.TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.White;
+            this.TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.Black;
+            this.TrackerDataGrid.RowTemplate.Height = 25;
+            this.TrackerDataGrid.RowTemplate.ReadOnly = true;
+            this.TrackerDataGrid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.TrackerDataGrid.Size = new System.Drawing.Size(357, 150);
+            this.TrackerDataGrid.TabIndex = 0;
             // 
             // name
             // 
@@ -84,7 +70,7 @@
             // 
             // count
             // 
-            this.count.HeaderText = "Column2";
+            this.count.HeaderText = "Column1";
             this.count.Name = "count";
             this.count.ReadOnly = true;
             // 
@@ -92,10 +78,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(296, 303);
+            this.ClientSize = new System.Drawing.Size(357, 150);
             this.Controls.Add(this.TrackerDataGrid);
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;

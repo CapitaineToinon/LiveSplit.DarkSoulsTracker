@@ -18,6 +18,7 @@ namespace LiveSplit.UI.Components
         private LiveSplitState _state;
         private Tracker tracker;
         private DetailedView detailedView;
+        private bool firstSettings = true;
 
         private double _percentage = -1;
         private string _percentageString
@@ -63,7 +64,6 @@ namespace LiveSplit.UI.Components
 
             this.InternalComponent = new PercentageTextComponent("Progression", "-", Settings);
 
-
             tracker = new Tracker();
             tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
 
@@ -76,22 +76,24 @@ namespace LiveSplit.UI.Components
         {
             if (detailedView != null)
             {
-                detailedView.ShowPercentage = !Settings.ShowPercentage;
+                detailedView.ShowPercentage = Settings.ShowPercentage;
+                detailedView.DarkTheme = Settings.DarkTheme;
             }
         }
 
-        private void Settings_FontChanged(object sender, EventArgs e)
+        private void Settings_OnToggleDetails(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            ToggleDetailedView();
         }
 
-        private void Settings_OnToggleDetails(object sender, EventArgs e)
+        private void ToggleDetailedView()
         {
             if (detailedView == null)
             {
                 detailedView = new DetailedView
                 {
-                    ShowPercentage = Settings.ShowPercentage
+                    ShowPercentage = Settings.ShowPercentage,
+                    DarkTheme = Settings.DarkTheme
                 };
 
                 detailedView.OnClosed += DetailedView_OnClosed;
@@ -128,11 +130,6 @@ namespace LiveSplit.UI.Components
                     detailedView.KilledNonRespawningEnemiesCount = t.KilledNonRespawningEnemiesCount;
                     detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
                     detailedView.Percentage = _percentageString;
-
-                    //detailedView.TextFont = InternalComponent.NameLabel;
-                    //// TODO : Font not working
-                    //detailedView.TimesFont = InternalComponent.ValueLabel;
-                    //detailedView.BackgroundColor = _state.LayoutSettings.BackgroundColor;
                 }
             }
         }
@@ -182,13 +179,21 @@ namespace LiveSplit.UI.Components
 
         private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
         {
-            var gradientBrush = new LinearGradientBrush(
-                new PointF(0, 0),
-                new PointF(0, height),
-                Settings.BackgroundColor,
-                Settings.BackgroundColor);
-
-            g.FillRectangle(gradientBrush, 0, 0, width, height);
+            if (Settings.BackgroundColor.A > 0
+                || Settings.BackgroundGradient != GradientType.Plain
+                && Settings.BackgroundColor2.A > 0)
+            {
+                var gradientBrush = new LinearGradientBrush(
+                            new PointF(0, 0),
+                            Settings.BackgroundGradient == GradientType.Horizontal
+                            ? new PointF(width, 0)
+                            : new PointF(0, height),
+                            Settings.BackgroundColor,
+                            Settings.BackgroundGradient == GradientType.Plain
+                            ? Settings.BackgroundColor
+                            : Settings.BackgroundColor2);
+                g.FillRectangle(gradientBrush, 0, 0, width, height);
+            }
         }
 
         void PrepareDraw(LiveSplitState state)
@@ -200,7 +205,7 @@ namespace LiveSplit.UI.Components
                 = state.LayoutSettings.DropShadows;
 
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
-            InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
+            InternalComponent.ValueLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
@@ -227,6 +232,11 @@ namespace LiveSplit.UI.Components
         public void SetSettings(System.Xml.XmlNode settings)
         {
             Settings.SetSettings(settings);
+            if (firstSettings && Settings.OpenAtLaunch)
+            {
+                firstSettings = false;
+                ToggleDetailedView();
+            }
         }
 
         public float MinimumWidth { get { return this.InternalComponent.MinimumWidth; } }

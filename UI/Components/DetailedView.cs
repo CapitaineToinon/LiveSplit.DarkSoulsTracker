@@ -9,6 +9,8 @@ namespace LiveSplit.UI.Components
     {
         public new event EventHandler OnClosed;
 
+        private const int WindowHeaderHeight = 14;
+
         private int[] defeatedBossesCount = new int[] { 0, 1 };
         private int[] itemsPickedUp = new int[] { 0, 1 };
         private int[] dissolvedFoggatesCount = new int[] { 0, 1 };
@@ -19,52 +21,24 @@ namespace LiveSplit.UI.Components
         private int[] killedNonRespawningEnemiesCount = new int[] { 0, 1 };
         private string percentage = "-";
 
-        private bool showPercentage = true;
+        private bool showPercentage;
+        private bool darkTheme;
 
         public bool ShowPercentage
         {
             set
             {
                 showPercentage = value;
-                UpdateView();
+                UpdateDataGridView();
             }
         }
 
-        public Color BackgroundColor
+        public bool DarkTheme
         {
             set
             {
-                if (TrackerDataGrid != null)
-                {
-                    TrackerDataGrid.BackgroundColor = value;
-                    TrackerDataGrid.RowsDefaultCellStyle.BackColor = value;
-                    TrackerDataGrid.RowsDefaultCellStyle.SelectionBackColor = value;
-                }
-            }
-        }
-
-        public SimpleLabel TextFont
-        {
-            set
-            {
-                if (TrackerDataGrid != null)
-                {
-                    TrackerDataGrid.Columns["name"].DefaultCellStyle.Font = value.Font;
-                    TrackerDataGrid.Columns["name"].DefaultCellStyle.ForeColor = value.ForeColor;
-                }
-            }
-        }
-
-        public SimpleLabel TimesFont
-        {
-            set
-            {
-                if (TrackerDataGrid != null)
-                {
-                    TrackerDataGrid.Columns["count"].DefaultCellStyle.Font = value.Font;
-                    TrackerDataGrid.Columns["count"].DefaultCellStyle.ForeColor = value.ForeColor;
-
-                }
+                darkTheme = value;
+                UpdateDataGridView();
             }
         }
 
@@ -73,51 +47,21 @@ namespace LiveSplit.UI.Components
             InitializeComponent();
 
             // Datagrid formatting
-            TrackerDataGrid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            TrackerDataGrid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            TrackerDataGrid.Columns["name"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            TrackerDataGrid.Columns["count"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             TrackerDataGrid.Columns["count"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             TrackerDataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
 
-            UpdateView();
+            TrackerDataGrid.Columns[0].DefaultCellStyle.Font = new Font("Calibri", 14.0f, FontStyle.Bold);
+            TrackerDataGrid.Columns[1].DefaultCellStyle.Font = new Font("Segoe UI", 14.0f, FontStyle.Bold);
 
-            this.Height = TrackerDataGrid.Height;
-        }
-
-        private void UpdateView()
-        {
-            List<string[]> tmp = new List<string[]>();
-            string[] row0 = { "Treasure Locations", FormatString(itemsPickedUp) };
-            string[] row1 = { "Bosses", FormatString(defeatedBossesCount) };
-            string[] row2 = { "Non-respawning Enemies", FormatString(killedNonRespawningEnemiesCount) };
-            string[] row3 = { "NPC Questlines", FormatString(completedQuestlinesCount) };
-            string[] row4 = { "Shortcuts / Locked Doors", FormatString(unlockedShortcutsAndLockedDoorsCount) };
-            string[] row5 = { "Illusory Walls", FormatString(revealedIllusoryWallsCount) };
-            string[] row6 = { "Foggates", FormatString(dissolvedFoggatesCount) };
-            string[] row7 = { "Kindled Bonfires", FormatString(fullyKindledBonfires) };
-
-
-            tmp.Add(row0);
-            tmp.Add(row1);
-            tmp.Add(row2);
-            tmp.Add(row3);
-            tmp.Add(row4);
-            tmp.Add(row5);
-            tmp.Add(row6);
-            tmp.Add(row7);
-
-            if (showPercentage)
-            {
-                string[] row8 = { "Progression", percentage };
-                tmp.Add(row8);
-            }
-
-            UpdateDataGridView(tmp);
+            UpdateDataGridView();
         }
 
         // Delegate pour update le textbox de la form
-        delegate void UpdateGridView(List<string[]> rows);
+        delegate void UpdateGridView();
 
-        private void UpdateDataGridView(List<string[]> rows)
+        private void UpdateDataGridView()
         {
             // InvokeRequired required compares the thread ID of the
             // calling thread to the thread ID of the creating thread.
@@ -125,15 +69,63 @@ namespace LiveSplit.UI.Components
             if (this.TrackerDataGrid.InvokeRequired)
             {
                 UpdateGridView d = new UpdateGridView(UpdateDataGridView);
-                this.Invoke(d, new object[] { rows });
+                this.Invoke(d, new object[] { });
             }
             else
             {
+                // Style
+                if (darkTheme)
+                {
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionForeColor =
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.ForeColor = Color.White;
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionBackColor =
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.BackColor = Color.Black;
+                }
+                else
+                {
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionForeColor =
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.ForeColor = Color.Black;
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.SelectionBackColor =
+                    TrackerDataGrid.RowTemplate.DefaultCellStyle.BackColor = Color.White;
+                }
+
+                // Content
+                List<string[]> tmp = new List<string[]>();
+                string[] row0 = { "Treasure Locations", FormatString(itemsPickedUp) };
+                string[] row1 = { "Bosses", FormatString(defeatedBossesCount) };
+                string[] row2 = { "Non-respawning Enemies", FormatString(killedNonRespawningEnemiesCount) };
+                string[] row3 = { "NPC Questlines", FormatString(completedQuestlinesCount) };
+                string[] row4 = { "Shortcuts / Locked Doors", FormatString(unlockedShortcutsAndLockedDoorsCount) };
+                string[] row5 = { "Illusory Walls", FormatString(revealedIllusoryWallsCount) };
+                string[] row6 = { "Foggates", FormatString(dissolvedFoggatesCount) };
+                string[] row7 = { "Kindled Bonfires", FormatString(fullyKindledBonfires) };
+
+                tmp.Add(row0);
+                tmp.Add(row1);
+                tmp.Add(row2);
+                tmp.Add(row3);
+                tmp.Add(row4);
+                tmp.Add(row5);
+                tmp.Add(row6);
+                tmp.Add(row7);
+
+                if (showPercentage)
+                {
+                    string[] row8 = { "Progression", percentage };
+                    tmp.Add(row8);
+                }
+
                 this.TrackerDataGrid.Rows.Clear();
-                foreach (string[] row in rows)
+                foreach (string[] row in tmp)
                 {
                     TrackerDataGrid.Rows.Add(row);
                 }
+
+                TrackerDataGrid.Height = (TrackerDataGrid.Rows[0].Height * (TrackerDataGrid.Rows.Count + 1));
+                this.Height = TrackerDataGrid.Size.Height + WindowHeaderHeight;
+
+                // refresh
+                TrackerDataGrid.Invalidate();
             }
         }
 
@@ -219,7 +211,7 @@ namespace LiveSplit.UI.Components
                 if (value != percentage)
                 {
                     percentage = value;
-                    UpdateView();
+                    UpdateDataGridView();
                 }
             }
         }

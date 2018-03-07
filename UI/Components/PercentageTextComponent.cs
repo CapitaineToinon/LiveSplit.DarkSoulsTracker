@@ -1,4 +1,6 @@
-﻿namespace LiveSplit.UI.Components
+﻿using System.Drawing;
+
+namespace LiveSplit.UI.Components
 {
     public class PercentageTextComponent : InfoTextComponent
     {
@@ -12,9 +14,19 @@
 
         public override void PrepareDraw(Model.LiveSplitState state, LayoutMode mode)
         {
-            NameMeasureLabel.Font = /*Settings.OverrideFont1 ? Settings.Font1 :*/ state.LayoutSettings.TextFont;
-            ValueLabel.Font = /*Settings.OverrideFont2 ? Settings.Font2 :*/ state.LayoutSettings.TimesFont;
-            NameLabel.Font = /*Settings.OverrideFont1 ? Settings.Font1 :*/ state.LayoutSettings.TextFont;
+            NameMeasureLabel.Font = state.LayoutSettings.TextFont;
+            ValueLabel.Font = state.LayoutSettings.TimesFont;
+            NameLabel.Font = state.LayoutSettings.TextFont;
+            if (mode == LayoutMode.Vertical)
+            {
+                NameLabel.VerticalAlignment = StringAlignment.Center;
+                ValueLabel.VerticalAlignment = StringAlignment.Center;
+            }
+            else
+            {
+                NameLabel.VerticalAlignment = StringAlignment.Near;
+                ValueLabel.VerticalAlignment = StringAlignment.Far;
+            }
         }
     }
 }
