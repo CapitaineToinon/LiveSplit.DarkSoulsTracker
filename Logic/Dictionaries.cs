@@ -1,8 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace Livesplit.DarkSouls100Tracker.Logic
 {
+    public enum ExeTypes
+    {
+        Release,
+        Debug,
+        Beta,
+        Unknown,
+    }
+
     public enum PointerType
     {
         updateFullyKindledBonfires,
@@ -231,9 +239,9 @@ namespace Livesplit.DarkSouls100PercentTracker
                     new int[] { 1401, 1402 }, // 'Undead Merchant (Male)
                     new int[] { 1434, 1435 } // 'Domhnall
                 };
-    }
+            }
         }
-            
+
 
         // Dictionary for treasure locations that have multiple pickups/event flags associated with it. Key is the first flag, values are the remaining flags
         public Dictionary<int, int[]> SharedTreasureLocationItems
@@ -260,6 +268,6 @@ namespace Livesplit.DarkSouls100PercentTracker
                 };
             }
         }
-            
+
     }
 }

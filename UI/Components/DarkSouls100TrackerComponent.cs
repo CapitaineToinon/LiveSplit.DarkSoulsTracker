@@ -1,24 +1,24 @@
 ﻿using LiveSplit.Model;
-using LiveSplit.UI.Components;
-using LiveSplit.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using LiveSplit.TimeFormatters;
 using System.Drawing.Drawing2D;
+using Livesplit.DarkSouls100Tracker.Logic;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace LiveSplit.UI.Components
 {
-    public class DarkSoulsTrackerUIComponant : IComponent
+    public class DarkSouls100TrackerComponent : IComponent
     {
-        protected InfoTextComponent InternalComponent { get; set; }
-        public DarkSouls100PercentTrackerSettings Settings{ get; set; }
+        protected PercentageTextComponent InternalComponent { get; set; }
+        public DarkSouls100TrackerSettings Settings { get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
 
         private LiveSplitState _state;
         private Tracker tracker;
         private DetailedView detailedView;
+        private bool firstSettings = true;
 
         private double _percentage = -1;
         private string _percentageString
@@ -28,7 +28,7 @@ namespace Livesplit.DarkSouls100PercentTracker
                 if (_percentage == -1 || !tracker.IsThreadRunning)
                 {
                     return "-";
-                } 
+                }
                 else if (Settings.Accuracy == TimeAccuracy.Seconds)
                 {
                     return string.Format("{0}%", (Math.Truncate(_percentage)).ToString());
@@ -53,15 +53,16 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         public IDictionary<string, Action> ContextMenuControls => null;
 
-        public DarkSoulsTrackerUIComponant(LiveSplitState state)
+        public DarkSouls100TrackerComponent(LiveSplitState state)
         {
-            Settings = new DarkSouls100PercentTrackerSettings()
+            Settings = new DarkSouls100TrackerSettings()
             {
                 CurrentState = state
             };
+            Settings.OnDetailedSettingsChanged += Settings_OnDetailedSettingsChanged;
             Settings.OnToggleDetails += Settings_OnToggleDetails;
 
-            this.InternalComponent = new InfoTextComponent("Progression", "-");
+            this.InternalComponent = new PercentageTextComponent("Progression", "-", Settings);
 
             tracker = new Tracker();
             tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
@@ -71,14 +72,34 @@ namespace Livesplit.DarkSouls100PercentTracker
             _state.OnStart += _state_OnStart;
         }
 
+        private void Settings_OnDetailedSettingsChanged(object sender, EventArgs e)
+        {
+            if (detailedView != null)
+            {
+                detailedView.ShowPercentage = Settings.ShowPercentage;
+                detailedView.DarkTheme = Settings.DarkTheme;
+            }
+        }
+
         private void Settings_OnToggleDetails(object sender, EventArgs e)
+        {
+            ToggleDetailedView();
+        }
+
+        private void ToggleDetailedView()
         {
             if (detailedView == null)
             {
-                detailedView = new DetailedView();
+                detailedView = new DetailedView
+                {
+                    ShowPercentage = Settings.ShowPercentage,
+                    DarkTheme = Settings.DarkTheme
+                };
+
                 detailedView.OnClosed += DetailedView_OnClosed;
                 detailedView.Show();
-            } else
+            }
+            else
             {
                 detailedView.Close();
                 detailedView = null;
@@ -100,15 +121,15 @@ namespace Livesplit.DarkSouls100PercentTracker
 
                 if (detailedView != null)
                 {
-                    detailedView.DefeatedBossesCount                    = t.DefeatedBossesCount;             
-                    detailedView.ItemsPickedUp                          = t.ItemsPickedUp;
-                    detailedView.DissolvedFoggatesCount                 = t.DissolvedFoggatesCount;
-                    detailedView.RevealedIllusoryWallsCount             = t.RevealedIllusoryWallsCount;
-                    detailedView.UnlockedShortcutsAndLockedDoorsCount   = t.UnlockedShortcutsAndLockedDoorsCount;
-                    detailedView.CompletedQuestlinesCount               = t.CompletedQuestlinesCount;
-                    detailedView.KilledNonRespawningEnemiesCount        = t.KilledNonRespawningEnemiesCount;
-                    detailedView.FullyKindledBonfires                   = t.FullyKindledBonfires;
-                    detailedView.Percentage                             = _percentageString;
+                    detailedView.DefeatedBossesCount = t.DefeatedBossesCount;
+                    detailedView.ItemsPickedUp = t.ItemsPickedUp;
+                    detailedView.DissolvedFoggatesCount = t.DissolvedFoggatesCount;
+                    detailedView.RevealedIllusoryWallsCount = t.RevealedIllusoryWallsCount;
+                    detailedView.UnlockedShortcutsAndLockedDoorsCount = t.UnlockedShortcutsAndLockedDoorsCount;
+                    detailedView.CompletedQuestlinesCount = t.CompletedQuestlinesCount;
+                    detailedView.KilledNonRespawningEnemiesCount = t.KilledNonRespawningEnemiesCount;
+                    detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
+                    detailedView.Percentage = _percentageString;
                 }
             }
         }
@@ -184,7 +205,7 @@ namespace Livesplit.DarkSouls100PercentTracker
                 = state.LayoutSettings.DropShadows;
 
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
-            InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
+            InternalComponent.ValueLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
@@ -211,6 +232,11 @@ namespace Livesplit.DarkSouls100PercentTracker
         public void SetSettings(System.Xml.XmlNode settings)
         {
             Settings.SetSettings(settings);
+            if (firstSettings && Settings.OpenAtLaunch)
+            {
+                firstSettings = false;
+                ToggleDetailedView();
+            }
         }
 
         public float MinimumWidth { get { return this.InternalComponent.MinimumWidth; } }

@@ -1,5 +1,4 @@
-﻿
-using LiveSplit.Model;
+﻿using LiveSplit.Model;
 using LiveSplit.Model.Comparisons;
 using LiveSplit.TimeFormatters;
 using LiveSplit.UI;
@@ -9,15 +8,45 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace LiveSplit.UI.Components
 {
-    public partial class DarkSouls100PercentTrackerSettings : UserControl
+    public partial class DarkSouls100TrackerSettings : UserControl
     {
         public event EventHandler OnToggleDetails;
+        public event EventHandler OnDetailedSettingsChanged;
 
         public Color TextColor { get; set; }
         public bool OverrideTextColor { get; set; }
+
         public TimeAccuracy Accuracy { get; set; }
+
+        private bool showPercetnage;
+        private bool darkTheme;
+        public bool ShowPercentage
+        {
+            get
+            {
+                return showPercetnage;
+            }
+            set
+            {
+                showPercetnage = value;
+                this.OnDetailedSettingsChanged(this, EventArgs.Empty);
+            }
+        }
+        public bool DarkTheme
+        {
+            get
+            {
+                return darkTheme;
+            }
+            set
+            {
+                darkTheme = value;
+                this.OnDetailedSettingsChanged(this, EventArgs.Empty);
+            }
+        }
+        public bool OpenAtLaunch { get; set; }
 
         public Color BackgroundColor { get; set; }
         public Color BackgroundColor2 { get; set; }
@@ -33,7 +62,7 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         public LayoutMode Mode { get; set; }
 
-        public DarkSouls100PercentTrackerSettings()
+        public DarkSouls100TrackerSettings()
         {
             InitializeComponent();
 
@@ -50,19 +79,24 @@ namespace Livesplit.DarkSouls100PercentTracker
             cmbGradientType.DataBindings.Add("SelectedItem", this, "GradientString", false, DataSourceUpdateMode.OnPropertyChanged);
             btnColor1.DataBindings.Add("BackColor", this, "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
             btnColor2.DataBindings.Add("BackColor", this, "BackgroundColor2", false, DataSourceUpdateMode.OnPropertyChanged);
+            chkShowPercentage.DataBindings.Add("Checked", this, "ShowPercentage", false, DataSourceUpdateMode.OnPropertyChanged);
+            chkDarkTheme.DataBindings.Add("Checked", this, "DarkTheme", false, DataSourceUpdateMode.OnPropertyChanged);
+            chkOpenAtLaunch.DataBindings.Add("Checked", this, "OpenAtLaunch", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
         void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
         {
-            label1.Enabled = btnTextColor.Enabled = chkOverrideTextColor.Checked;
+            TextLabel.Enabled = btnTextColor.Enabled = chkOverrideTextColor.Checked;
         }
 
         void DeltaSettings_Load(object sender, EventArgs e)
         {
             chkOverrideTextColor_CheckedChanged(null, null);
+
             rdoSeconds.Checked = Accuracy == TimeAccuracy.Seconds;
             rdoTenths.Checked = Accuracy == TimeAccuracy.Tenths;
             rdoHundredths.Checked = Accuracy == TimeAccuracy.Hundredths;
+
             if (Mode == LayoutMode.Horizontal)
             {
                 chkTwoRows.Enabled = false;
@@ -75,14 +109,6 @@ namespace Livesplit.DarkSouls100PercentTracker
                 chkTwoRows.DataBindings.Clear();
                 chkTwoRows.DataBindings.Add("Checked", this, "Display2Rows", false, DataSourceUpdateMode.OnPropertyChanged);
             }
-        }
-
-        void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            btnColor1.Visible = cmbGradientType.SelectedItem.ToString() != "Plain";
-            btnColor2.DataBindings.Clear();
-            btnColor2.DataBindings.Add("BackColor", this, btnColor1.Visible ? "BackgroundColor2" : "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
-            GradientString = cmbGradientType.SelectedItem.ToString();
         }
 
         void rdoHundredths_CheckedChanged(object sender, EventArgs e)
@@ -115,6 +141,9 @@ namespace Livesplit.DarkSouls100PercentTracker
             BackgroundColor2 = SettingsHelper.ParseColor(element["BackgroundColor2"]);
             GradientString = SettingsHelper.ParseString(element["BackgroundGradient"]);
             Display2Rows = SettingsHelper.ParseBool(element["Display2Rows"]);
+            ShowPercentage = SettingsHelper.ParseBool(element["ShowPercentage"]);
+            DarkTheme = SettingsHelper.ParseBool(element["DarkTheme"]);
+            OpenAtLaunch = SettingsHelper.ParseBool(element["OpenAtLaunch"]);
         }
 
         public XmlNode GetSettings(XmlDocument document)
@@ -138,7 +167,10 @@ namespace Livesplit.DarkSouls100PercentTracker
             SettingsHelper.CreateSetting(document, parent, "BackgroundColor", BackgroundColor) ^
             SettingsHelper.CreateSetting(document, parent, "BackgroundColor2", BackgroundColor2) ^
             SettingsHelper.CreateSetting(document, parent, "BackgroundGradient", BackgroundGradient) ^
-            SettingsHelper.CreateSetting(document, parent, "Display2Rows", Display2Rows);
+            SettingsHelper.CreateSetting(document, parent, "Display2Rows", Display2Rows) ^
+            SettingsHelper.CreateSetting(document, parent, "ShowPercentage", ShowPercentage) ^
+            SettingsHelper.CreateSetting(document, parent, "DarkTheme", DarkTheme) ^
+            SettingsHelper.CreateSetting(document, parent, "OpenAtLaunch", OpenAtLaunch);
         }
 
         private void ColorButtonClick(object sender, EventArgs e)
@@ -149,6 +181,14 @@ namespace Livesplit.DarkSouls100PercentTracker
         private void btnDetails_Click(object sender, EventArgs e)
         {
             this.OnToggleDetails(sender, EventArgs.Empty);
+        }
+
+        private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            btnColor1.Visible = cmbGradientType.SelectedItem.ToString() != "Plain";
+            btnColor2.DataBindings.Clear();
+            btnColor2.DataBindings.Add("BackColor", this, btnColor1.Visible ? "BackgroundColor2" : "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
+            GradientString = cmbGradientType.SelectedItem.ToString();
         }
     }
 }

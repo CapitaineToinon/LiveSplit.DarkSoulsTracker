@@ -1,4 +1,4 @@
-﻿namespace Livesplit.DarkSouls100PercentTracker
+﻿namespace Livesplit.DarkSouls100Tracker.Logic
 {
     static class Flags
     {

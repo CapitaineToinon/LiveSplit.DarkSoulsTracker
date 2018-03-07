@@ -2,13 +2,12 @@
 using LiveSplit.UI.Components;
 using System;
 using LiveSplit.Model;
-using Livesplit.DarkSouls100PercentTracker;
 
 [assembly: ComponentFactory(typeof(DarkSouls100PercentTrackerFactory))]
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace LiveSplit.UI.Components
 {
-    class DarkSouls100PercentTrackerFactory : IComponentFactory
+    public class DarkSouls100PercentTrackerFactory : IComponentFactory
     {
         public string ComponentName
         {
@@ -42,7 +41,7 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         public IComponent Create(LiveSplitState state)
         {
-            return new DarkSoulsTrackerUIComponant(state);
+            return new DarkSouls100TrackerComponent(state);
         }
 
         public string XMLURL
