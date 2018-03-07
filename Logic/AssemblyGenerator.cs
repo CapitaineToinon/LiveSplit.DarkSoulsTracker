@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace Livesplit.DarkSouls100Tracker.Logic
 {
     class AssemblyGenerator
     {

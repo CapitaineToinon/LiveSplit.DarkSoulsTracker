@@ -4,16 +4,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace Livesplit.DarkSouls100Tracker.Logic
 {
-    public enum ExeTypes
-    {
-        Release,
-        Debug,
-        Beta,
-        Unknown,
-    }
-
     public static class Constants
     {
         public const int PROCESS_VM_READ = 0x10;

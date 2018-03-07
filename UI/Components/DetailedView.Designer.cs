@@ -1,4 +1,4 @@
-﻿namespace Livesplit.DarkSouls100PercentTracker
+﻿namespace LiveSplit.UI.Components
 {
     partial class DetailedView
     {
@@ -100,6 +100,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DetailedView";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "Detailed Tracker";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DetailedView_FormClosing);

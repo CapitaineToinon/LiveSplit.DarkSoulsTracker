@@ -117,16 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="count.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        AAABAAEAQD8AAAEAIAAgQQAAFgAAACgAAABAAAAAfgAAAAEAIAAAAAAAAD8AABMLAAATCwAAAAAAAAAA
+        AAABAAEAQD8AAAEAIAAgQQAAFgAAACgAAABAAAAAfgAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         AAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AN3m
         /wDd5v8A3eb/AN3m/wDd5v8A3eb/AMbd/ADU5fwA9fP/AJe99QBapvIAttH7AD546ACjv/UEocT0MKDI
         74bq8fzX+Pb9+Ozv+8LG4PVke63nGYOj7ACoz/UAN3joAMbV+wCgwfcAb6fvAEqL6wCZxfcA6PH+ANzq
@@ -395,16 +389,16 @@
         /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
         /wD///8A////AP///wD///8AquDbCk2lm5VRpqJt////AP///wD///8A////AP///wD///8A////AP//
         /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
-        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD////gH///////
-        /8AH////////AAP///////4AAP///////AAAf//////4AAA///////AAAB//////4AAAD//////AAAAH
-        /////8AAAAP/////gAAAA/////8AAAAB/////wAAAAD////+AAAAAP////4AAAAAf////gAAAAB////8
-        AAAAAH////wAAAAAf////AAAAAB////8AAAAAH////wAAAAAf////AAAAAB////8AAAAAH////wAAAAA
-        f////AAAAAB////8AAAAAH////wAAAAAf////AAAAAB////8AAAAAH////wAAAAAf////AAAAAB////+
-        AAAAAP////4AAAAA/////wAAAAH/////AAABAf////+AAAED/////4AAAYf/////wAABh//////gAAHP
-        /////+AAAf//////8AAB///////wAAH///////gAAf///////AAB///////8AAH///////4AAf//////
-        /gAD////////AAP///////8AA////////4AH////////gAf////////AD////////8AP////////wB//
-        ///////AH////////+A/////////4D/////////gf////////+D/////////4P/////////h////////
-        /+P/////////x/////8=
+        /wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD////4f///////
+        /+Af////////wAf///////8AAf///////gAA///////8AAB///////gAAD//////8AAAH//////gAAAP
+        /////+AAAAf/////wAAAA/////+AAAAD/////4AAAAH/////AAAAAf////8AAAAA/////wAAAAD////+
+        AAAAAP////4AAAAAf////gAAAAB////+AAAAAH////wAAAAAf////AAAAAB////8AAAAAH////wAAAAA
+        f////AAAAAB////8AAAAAH////4AAAAAf////gAAAAB////+AAAAAP////4AAAAA/////gAAAAD/////
+        AAAAAf////8AAAIB/////4AAAwP/////gAADA//////AAAOH/////8AAA8f/////4AADz//////gAAP/
+        //////AAA///////+AAD///////4AAP///////wAA////////AAD///////+AAP///////4AB///////
+        /wAH////////gAf///////+AB////////8AP////////wA/////////AH////////+Af////////4B//
+        ///////gP/////////B/////////8H/////////w//////////H/////////8f/////////z////////
+        //f/////////7/////8=
 </value>
   </data>
 </root>

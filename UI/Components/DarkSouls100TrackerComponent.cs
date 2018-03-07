@@ -1,19 +1,18 @@
 ﻿using LiveSplit.Model;
-using LiveSplit.UI.Components;
-using LiveSplit.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using LiveSplit.TimeFormatters;
 using System.Drawing.Drawing2D;
+using Livesplit.DarkSouls100Tracker.Logic;
 
-namespace Livesplit.DarkSouls100PercentTracker
+namespace LiveSplit.UI.Components
 {
-    public class DarkSoulsTrackerUIComponant : IComponent
+    public class DarkSouls100TrackerComponent : IComponent
     {
-        protected InfoTextComponent InternalComponent { get; set; }
-        public DarkSouls100PercentTrackerSettings Settings { get; set; }
+        protected PercentageTextComponent InternalComponent { get; set; }
+        public DarkSouls100TrackerSettings Settings { get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
 
         private LiveSplitState _state;
@@ -28,7 +27,7 @@ namespace Livesplit.DarkSouls100PercentTracker
                 if (_percentage == -1 || !tracker.IsThreadRunning)
                 {
                     return "-";
-                } 
+                }
                 else if (Settings.Accuracy == TimeAccuracy.Seconds)
                 {
                     return string.Format("{0}%", (Math.Truncate(_percentage)).ToString());
@@ -53,17 +52,17 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         public IDictionary<string, Action> ContextMenuControls => null;
 
-        public DarkSoulsTrackerUIComponant(LiveSplitState state)
+        public DarkSouls100TrackerComponent(LiveSplitState state)
         {
-            Settings = new DarkSouls100PercentTrackerSettings()
+            Settings = new DarkSouls100TrackerSettings()
             {
                 CurrentState = state
             };
+            Settings.OnDetailedSettingsChanged += Settings_OnDetailedSettingsChanged;
             Settings.OnToggleDetails += Settings_OnToggleDetails;
 
-            this.InternalComponent = new InfoTextComponent("Progression", "-");
-            
-            
+            this.InternalComponent = new PercentageTextComponent("Progression", "-", Settings);
+
 
             tracker = new Tracker();
             tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
@@ -71,6 +70,14 @@ namespace Livesplit.DarkSouls100PercentTracker
             _state = state;
             _state.OnReset += _state_OnReset;
             _state.OnStart += _state_OnStart;
+        }
+
+        private void Settings_OnDetailedSettingsChanged(object sender, EventArgs e)
+        {
+            if (detailedView != null)
+            {
+                detailedView.ShowPercentage = !Settings.ShowPercentage;
+            }
         }
 
         private void Settings_FontChanged(object sender, EventArgs e)
@@ -84,14 +91,13 @@ namespace Livesplit.DarkSouls100PercentTracker
             {
                 detailedView = new DetailedView
                 {
-                    TextFont = InternalComponent.NameLabel,
-                    // TODO : Font not working
-                    TimesFont = InternalComponent.ValueLabel,
+                    ShowPercentage = Settings.ShowPercentage
                 };
 
                 detailedView.OnClosed += DetailedView_OnClosed;
                 detailedView.Show();
-            } else
+            }
+            else
             {
                 detailedView.Close();
                 detailedView = null;
@@ -123,10 +129,10 @@ namespace Livesplit.DarkSouls100PercentTracker
                     detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
                     detailedView.Percentage = _percentageString;
 
-                    detailedView.TextFont = InternalComponent.NameLabel;
-                    // TODO : Font not working
-                    detailedView.TimesFont = InternalComponent.ValueLabel;
-                    detailedView.BackgroundColor = _state.LayoutSettings.BackgroundColor;
+                    //detailedView.TextFont = InternalComponent.NameLabel;
+                    //// TODO : Font not working
+                    //detailedView.TimesFont = InternalComponent.ValueLabel;
+                    //detailedView.BackgroundColor = _state.LayoutSettings.BackgroundColor;
                 }
             }
         }
@@ -176,21 +182,13 @@ namespace Livesplit.DarkSouls100PercentTracker
 
         private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
         {
-            if (Settings.BackgroundColor.A > 0
-                || Settings.BackgroundGradient != GradientType.Plain
-                && Settings.BackgroundColor2.A > 0)
-            {
-                var gradientBrush = new LinearGradientBrush(
-                            new PointF(0, 0),
-                            Settings.BackgroundGradient == GradientType.Horizontal
-                            ? new PointF(width, 0)
-                            : new PointF(0, height),
-                            Settings.BackgroundColor,
-                            Settings.BackgroundGradient == GradientType.Plain
-                            ? Settings.BackgroundColor
-                            : Settings.BackgroundColor2);
-                g.FillRectangle(gradientBrush, 0, 0, width, height);
-            }
+            var gradientBrush = new LinearGradientBrush(
+                new PointF(0, 0),
+                new PointF(0, height),
+                Settings.BackgroundColor,
+                Settings.BackgroundColor);
+
+            g.FillRectangle(gradientBrush, 0, 0, width, height);
         }
 
         void PrepareDraw(LiveSplitState state)
@@ -203,10 +201,6 @@ namespace Livesplit.DarkSouls100PercentTracker
 
             InternalComponent.NameLabel.ForeColor = Settings.OverrideTextColor ? Settings.TextColor : state.LayoutSettings.TextColor;
             InternalComponent.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
-
-            InternalComponent.NameLabel.Font = _state.LayoutSettings.TextFont;
-            // TODO : Font not working
-            InternalComponent.ValueLabel.Font = state.LayoutSettings.TimesFont;
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
