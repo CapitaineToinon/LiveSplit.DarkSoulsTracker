@@ -77,9 +77,9 @@ namespace LiveSplit.UI.Components
         {
             if (firstSettings && Settings.OpenAtLaunch)
             {
-                firstSettings = false;
                 ToggleDetailedView();
             }
+            firstSettings = false;
         }
 
         private void Settings_OnDetailedSettingsChanged(object sender, EventArgs e)
