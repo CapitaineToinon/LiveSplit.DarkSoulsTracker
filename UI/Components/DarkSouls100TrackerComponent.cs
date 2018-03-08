@@ -15,7 +15,7 @@ namespace LiveSplit.UI.Components
         public DarkSouls100TrackerSettings Settings { get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
 
-        private LiveSplitState _state;
+        private LiveSplitState state;
         private Tracker tracker;
         private DetailedView detailedView;
         private bool firstSettings = true;
@@ -61,15 +61,25 @@ namespace LiveSplit.UI.Components
             };
             Settings.OnDetailedSettingsChanged += Settings_OnDetailedSettingsChanged;
             Settings.OnToggleDetails += Settings_OnToggleDetails;
+            Settings.OnSettingsLoaded += Settings_OnSettingsLoaded;
 
             this.InternalComponent = new PercentageTextComponent("Progression", "-", Settings);
 
             tracker = new Tracker();
             tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
 
-            _state = state;
-            _state.OnReset += _state_OnReset;
-            _state.OnStart += _state_OnStart;
+            this.state = state;
+            this.state.OnReset += _state_OnReset;
+            this.state.OnStart += _state_OnStart;
+        }
+
+        private void Settings_OnSettingsLoaded(object sender, EventArgs e)
+        {
+            if (firstSettings && Settings.OpenAtLaunch)
+            {
+                firstSettings = false;
+                ToggleDetailedView();
+            }
         }
 
         private void Settings_OnDetailedSettingsChanged(object sender, EventArgs e)
@@ -93,11 +103,17 @@ namespace LiveSplit.UI.Components
                 detailedView = new DetailedView
                 {
                     ShowPercentage = Settings.ShowPercentage,
-                    DarkTheme = Settings.DarkTheme
+                    DarkTheme = Settings.DarkTheme,
                 };
 
-                detailedView.OnClosed += DetailedView_OnClosed;
+                detailedView.Left = Settings.DetailedTrackerX;
+                detailedView.Top = Settings.DetailedTrackerY;
+
                 detailedView.Show();
+
+                detailedView.OnClosed += DetailedView_OnClosed;
+                detailedView.OnLocationChanged += DetailedView_OnLocationChanged;
+                
             }
             else
             {
@@ -106,9 +122,21 @@ namespace LiveSplit.UI.Components
             }
         }
 
+        private void DetailedView_OnLocationChanged(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(DetailedView))
+            {
+                DetailedView d = (DetailedView)sender;
+                Settings.DetailedTrackerX = d.Left;
+                Settings.DetailedTrackerY = d.Top;
+            }
+        }
+
         private void DetailedView_OnClosed(object sender, EventArgs e)
         {
             detailedView.OnClosed -= DetailedView_OnClosed;
+            Settings.DetailedTrackerX = detailedView.Left;
+            Settings.DetailedTrackerY = detailedView.Top;
             detailedView = null;
         }
 
@@ -154,8 +182,8 @@ namespace LiveSplit.UI.Components
 
         public void Dispose()
         {
-            _state.OnReset -= _state_OnReset;
-            _state.OnStart -= _state_OnStart;
+            state.OnReset -= _state_OnReset;
+            state.OnStart -= _state_OnStart;
 
             if (detailedView != null)
             {
@@ -233,11 +261,6 @@ namespace LiveSplit.UI.Components
         public void SetSettings(System.Xml.XmlNode settings)
         {
             Settings.SetSettings(settings);
-            if (firstSettings && Settings.OpenAtLaunch)
-            {
-                firstSettings = false;
-                ToggleDetailedView();
-            }
         }
 
         public float MinimumWidth { get { return this.InternalComponent.MinimumWidth; } }

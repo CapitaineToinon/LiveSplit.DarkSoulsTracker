@@ -8,6 +8,7 @@ namespace LiveSplit.UI.Components
     public partial class DetailedView : Form
     {
         public new event EventHandler OnClosed;
+        public new event EventHandler OnLocationChanged;
 
         private const int WindowHeaderHeight = 14;
 
@@ -252,7 +253,14 @@ namespace LiveSplit.UI.Components
 
         private void DetailedView_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.OnClosed(this, EventArgs.Empty);
+            if (OnClosed != null)
+                this.OnClosed(this, EventArgs.Empty);
+        }
+
+        private void DetailedView_LocationChanged(object sender, EventArgs e)
+        {
+            if (OnLocationChanged != null)
+                this.OnLocationChanged(this, EventArgs.Empty);
         }
     }
 }

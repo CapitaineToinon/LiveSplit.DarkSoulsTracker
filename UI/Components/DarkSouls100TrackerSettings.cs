@@ -14,6 +14,7 @@ namespace LiveSplit.UI.Components
     {
         public event EventHandler OnToggleDetails;
         public event EventHandler OnDetailedSettingsChanged;
+        public event EventHandler OnSettingsLoaded;
 
         public Color TextColor { get; set; }
         public bool OverrideTextColor { get; set; }
@@ -61,6 +62,15 @@ namespace LiveSplit.UI.Components
         public bool Display2Rows { get; set; }
 
         public LayoutMode Mode { get; set; }
+        public int DetailedTrackerX { get; set; }
+        public int DetailedTrackerY { get; set; }
+        public Point DetailedTrackerLocation
+        {
+            get
+            {
+                return new Point(DetailedTrackerX, DetailedTrackerY);
+            }
+        }
 
         public DarkSouls100TrackerSettings()
         {
@@ -144,12 +154,15 @@ namespace LiveSplit.UI.Components
             ShowPercentage = SettingsHelper.ParseBool(element["ShowPercentage"]);
             DarkTheme = SettingsHelper.ParseBool(element["DarkTheme"]);
             OpenAtLaunch = SettingsHelper.ParseBool(element["OpenAtLaunch"]);
+            DetailedTrackerX = SettingsHelper.ParseInt(element["X"]);
+            DetailedTrackerY = SettingsHelper.ParseInt(element["Y"]);
         }
 
         public XmlNode GetSettings(XmlDocument document)
         {
             var parent = document.CreateElement("Settings");
             CreateSettingsNode(document, parent);
+            this.OnSettingsLoaded(this, EventArgs.Empty);
             return parent;
         }
 
@@ -170,7 +183,9 @@ namespace LiveSplit.UI.Components
             SettingsHelper.CreateSetting(document, parent, "Display2Rows", Display2Rows) ^
             SettingsHelper.CreateSetting(document, parent, "ShowPercentage", ShowPercentage) ^
             SettingsHelper.CreateSetting(document, parent, "DarkTheme", DarkTheme) ^
-            SettingsHelper.CreateSetting(document, parent, "OpenAtLaunch", OpenAtLaunch);
+            SettingsHelper.CreateSetting(document, parent, "OpenAtLaunch", OpenAtLaunch) ^
+            SettingsHelper.CreateSetting(document, parent, "X", DetailedTrackerX) ^
+            SettingsHelper.CreateSetting(document, parent, "Y", DetailedTrackerY);
         }
 
         private void ColorButtonClick(object sender, EventArgs e)

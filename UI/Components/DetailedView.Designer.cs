@@ -88,9 +88,11 @@
             this.MinimizeBox = false;
             this.Name = "DetailedView";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Detailed Tracker";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DetailedView_FormClosing);
+            this.LocationChanged += new System.EventHandler(this.DetailedView_LocationChanged);
             ((System.ComponentModel.ISupportInitialize)(this.TrackerDataGrid)).EndInit();
             this.ResumeLayout(false);
 
