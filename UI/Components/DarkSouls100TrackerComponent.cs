@@ -129,7 +129,8 @@ namespace LiveSplit.UI.Components
                     detailedView.CompletedQuestlinesCount = t.CompletedQuestlinesCount;
                     detailedView.KilledNonRespawningEnemiesCount = t.KilledNonRespawningEnemiesCount;
                     detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
-                    detailedView.Percentage = _percentageString;
+                    detailedView.StringPercentage = _percentageString;
+                    detailedView.Percentage = _percentage;
                 }
             }
         }

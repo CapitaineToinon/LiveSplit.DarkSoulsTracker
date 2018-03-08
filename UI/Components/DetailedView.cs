@@ -19,10 +19,35 @@ namespace LiveSplit.UI.Components
         private int[] unlockedShortcutsAndLockedDoorsCount = new int[] { 0, 1 };
         private int[] completedQuestlinesCount = new int[] { 0, 1 };
         private int[] killedNonRespawningEnemiesCount = new int[] { 0, 1 };
-        private string percentage = "-";
+        private string stringpercentage = "-";
+        private double percentage = 0;
 
         private bool showPercentage;
         private bool darkTheme;
+
+        public int FormTop
+        {
+            get
+            {
+                return Top;
+            }
+            set
+            {
+                Top = value;
+            }
+        }
+
+        public int FormLeft
+        {
+            get
+            {
+                return Left;
+            }
+            set
+            {
+                Left = value;
+            }
+        }
 
         public bool ShowPercentage
         {
@@ -111,7 +136,7 @@ namespace LiveSplit.UI.Components
 
                 if (showPercentage)
                 {
-                    string[] row8 = { "Progression", percentage };
+                    string[] row8 = { "Progression", stringpercentage };
                     tmp.Add(row8);
                 }
 
@@ -202,7 +227,16 @@ namespace LiveSplit.UI.Components
             }
         }
 
-        public string Percentage
+        public string StringPercentage
+        {
+            get => stringpercentage;
+            set
+            {
+                stringpercentage = value;
+            }
+        }
+
+        public double Percentage
         {
             get => percentage;
             set
