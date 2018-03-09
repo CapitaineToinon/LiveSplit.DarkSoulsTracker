@@ -19,7 +19,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         public const int PROCESS_VM_WRITE = (0x20);
         public const int PROCESS_ALL_ACCESS = 0x1F0FFF;
 
-        // 2 frames at 30 FPS
+        // in milliseconds
         public const int Thread_Frequency = 33;
 
         public const int BONFIRE_FULLY_KINDLED = 40;
@@ -781,7 +781,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
 
                         // tick
                         // Console.WriteLine("Tick");
-                        Thread.Sleep(1000);
+                        // Thread.Sleep(1000);
                     }
 
                     // Thread has been canceled, unhooks before leaving
