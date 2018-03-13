@@ -9,52 +9,24 @@ using Livesplit.DarkSouls100Tracker.Logic;
 
 namespace LiveSplit.UI.Components
 {
-    public class DarkSouls100TrackerComponent : IComponent
+    public class DarkSouls100Tracker : IComponent
     {
         protected PercentageTextComponent InternalComponent { get; set; }
         public DarkSouls100TrackerSettings Settings { get; set; }
         private DeltaTimeFormatter Formatter { get; set; }
 
         private LiveSplitState state;
-        private Tracker tracker;
+        private Game gameTracker;
+        private GameProgress gameProgress;
         private DetailedView detailedView;
         private bool firstSettings = true;
 
-        private double _percentage = -1;
-        private string _percentageString
-        {
-            get
-            {
-                if (_percentage == -1 || !tracker.IsThreadRunning)
-                {
-                    return "-";
-                }
-                else if (Settings.Accuracy == TimeAccuracy.Seconds)
-                {
-                    return string.Format("{0}%", (Math.Truncate(_percentage)).ToString());
-                }
-                else if (Settings.Accuracy == TimeAccuracy.Tenths)
-                {
-                    double tmp = Math.Truncate(_percentage * 10);
-                    return string.Format("{0}%", (tmp / 10).ToString("0.0"));
-                }
-                else
-                {
-                    double tmp = Math.Truncate(_percentage * 100);
-                    return string.Format("{0}%", (tmp / 100).ToString("0.00"));
-                }
-            }
-        }
-
-        public float PaddingTop => InternalComponent.PaddingTop;
-        public float PaddingLeft => InternalComponent.PaddingLeft;
-        public float PaddingBottom => InternalComponent.PaddingBottom;
-        public float PaddingRight => InternalComponent.PaddingRight;
-
         public IDictionary<string, Action> ContextMenuControls => null;
 
-        public DarkSouls100TrackerComponent(LiveSplitState state)
+        public DarkSouls100Tracker(LiveSplitState state)
         {
+            gameProgress = new GameProgress();
+
             Settings = new DarkSouls100TrackerSettings()
             {
                 CurrentState = state
@@ -65,12 +37,52 @@ namespace LiveSplit.UI.Components
 
             this.InternalComponent = new PercentageTextComponent("Progression", "-", Settings);
 
-            tracker = new Tracker();
-            tracker.OnPercentageUpdated += Tracker_PercentageUpdated;
+            gameTracker = new Game();
+            gameTracker.OnGameProgressUpdated += Tracker_OnGameProgressUpdated;
 
             this.state = state;
             this.state.OnReset += _state_OnReset;
             this.state.OnStart += _state_OnStart;
+        }
+
+        public string ComponentName
+        {
+            get { return "Dark Souls 100% Tracker"; }
+        }
+
+        private void _state_OnStart(object sender, EventArgs e)
+        {
+            gameTracker.Start();
+        }
+
+        void _state_OnReset(object sender, TimerPhase t)
+        {
+            gameTracker.Stop();
+        }
+
+        public void Dispose()
+        {
+            state.OnReset -= _state_OnReset;
+            state.OnStart -= _state_OnStart;
+
+            if (detailedView != null)
+            {
+                detailedView.Close();
+                detailedView = null;
+            }
+        }
+
+        private void Tracker_OnGameProgressUpdated(object sender, EventArgs e)
+        {
+            if (sender.GetType() == typeof(GameProgress))
+            {
+                gameProgress = (GameProgress)sender;
+
+                if (detailedView != null)
+                {
+                    detailedView.GameProgress = gameProgress;
+                }
+            }
         }
 
         private void Settings_OnSettingsLoaded(object sender, EventArgs e)
@@ -113,7 +125,6 @@ namespace LiveSplit.UI.Components
 
                 detailedView.OnClosed += DetailedView_OnClosed;
                 detailedView.OnLocationChanged += DetailedView_OnLocationChanged;
-                
             }
             else
             {
@@ -140,58 +151,7 @@ namespace LiveSplit.UI.Components
             detailedView = null;
         }
 
-        private void Tracker_PercentageUpdated(object sender, EventArgs e)
-        {
-            if (sender.GetType() == typeof(Tracker))
-            {
-                Tracker t = (Tracker)sender;
-                _percentage = t.TotalPercentage;
-
-                if (detailedView != null)
-                {
-                    detailedView.DefeatedBossesCount = t.DefeatedBossesCount;
-                    detailedView.ItemsPickedUp = t.ItemsPickedUp;
-                    detailedView.DissolvedFoggatesCount = t.DissolvedFoggatesCount;
-                    detailedView.RevealedIllusoryWallsCount = t.RevealedIllusoryWallsCount;
-                    detailedView.UnlockedShortcutsAndLockedDoorsCount = t.UnlockedShortcutsAndLockedDoorsCount;
-                    detailedView.CompletedQuestlinesCount = t.CompletedQuestlinesCount;
-                    detailedView.KilledNonRespawningEnemiesCount = t.KilledNonRespawningEnemiesCount;
-                    detailedView.FullyKindledBonfires = t.FullyKindledBonfires;
-                    detailedView.StringPercentage = _percentageString;
-                    detailedView.Percentage = _percentage;
-                }
-            }
-        }
-
-        public string ComponentName
-        {
-            get { return "Dark Souls 100% Tracker"; }
-        }
-
-        private void _state_OnStart(object sender, EventArgs e)
-        {
-            _percentage = 0;
-            tracker.Start();
-        }
-
-        void _state_OnReset(object sender, TimerPhase t)
-        {
-            tracker.Stop();
-            _percentage = -1;
-        }
-
-        public void Dispose()
-        {
-            state.OnReset -= _state_OnReset;
-            state.OnStart -= _state_OnStart;
-
-            if (detailedView != null)
-            {
-                detailedView.Close();
-                detailedView = null;
-            }
-        }
-
+        #region Useless shit
         public void DrawVertical(Graphics g, LiveSplitState state, float width, Region region)
         {
             DrawBackground(g, state, width, VerticalHeight);
@@ -239,9 +199,10 @@ namespace LiveSplit.UI.Components
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
-            if (invalidator != null && this.InternalComponent.InformationValue != _percentageString)
+            gameProgress.TimeAccuracy = Settings.Accuracy;
+            if (invalidator != null && this.InternalComponent.InformationValue != gameProgress.PercentageS)
             {
-                this.InternalComponent.InformationValue = _percentageString;
+                this.InternalComponent.InformationValue = Math.Truncate(gameProgress.Percentage).ToString();
                 invalidator.Invalidate(0f, 0f, width, height);
                 InternalComponent.Update(invalidator, state, width, height, mode);
             }
@@ -267,5 +228,10 @@ namespace LiveSplit.UI.Components
         public float MinimumHeight { get { return this.InternalComponent.MinimumHeight; } }
         public float VerticalHeight { get { return this.InternalComponent.VerticalHeight; } }
         public float HorizontalWidth { get { return this.InternalComponent.HorizontalWidth; } }
+        public float PaddingTop => InternalComponent.PaddingTop;
+        public float PaddingLeft => InternalComponent.PaddingLeft;
+        public float PaddingBottom => InternalComponent.PaddingBottom;
+        public float PaddingRight => InternalComponent.PaddingRight;
+        #endregion
     }
 }

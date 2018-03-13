@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using LiveSplit.TimeFormatters;
+using System;
+using System.Drawing;
 
 namespace LiveSplit.UI.Components
 {
