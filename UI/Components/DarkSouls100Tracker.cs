@@ -52,12 +52,14 @@ namespace LiveSplit.UI.Components
 
         private void _state_OnStart(object sender, EventArgs e)
         {
+            gameTracker.OnGameProgressUpdated += Tracker_OnGameProgressUpdated;
             gameTracker.Start();
         }
 
         void _state_OnReset(object sender, TimerPhase t)
         {
             gameTracker.Stop();
+            gameTracker.OnGameProgressUpdated -= Tracker_OnGameProgressUpdated;
         }
 
         public void Dispose()
@@ -200,7 +202,7 @@ namespace LiveSplit.UI.Components
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
             gameProgress.TimeAccuracy = Settings.Accuracy;
-            if (invalidator != null && this.InternalComponent.InformationValue != gameProgress.PercentageS)
+            if (invalidator != null && this.InternalComponent.InformationValue != gameProgress.PercentageString)
             {
                 this.InternalComponent.InformationValue = Math.Truncate(gameProgress.Percentage).ToString();
                 invalidator.Invalidate(0f, 0f, width, height);

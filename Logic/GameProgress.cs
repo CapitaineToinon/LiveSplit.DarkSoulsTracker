@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Livesplit.DarkSouls100Tracker.Logic
 {
@@ -10,7 +11,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         public List<Requirement> Requirements { get; set; }
         public TimeAccuracy TimeAccuracy;
         public double Percentage { get; set; }
-        public string PercentageS
+        public string PercentageString
         {
             get
             {
@@ -60,7 +61,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
             {
                 foreach (Requirement r in Requirements)
                 {
-                    p += r.Progression[0] * (r.Weight / r.Progression[1]);
+                    p += (r.Progression[0] * (r.Weight / r.Progression[1]) * 100);
                 }
             }
             Percentage = p;

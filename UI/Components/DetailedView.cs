@@ -22,9 +22,9 @@ namespace LiveSplit.UI.Components
             get { return gameProgress; }
             set
             {
-                value.UpdatePercentage();
                 if (gameProgress.Percentage != value.Percentage)
                 {
+                    MessageBox.Show("Updated : " + value.PercentageString);
                     gameProgress = value;
                     UpdateDataGridView();
                 }
@@ -129,15 +129,12 @@ namespace LiveSplit.UI.Components
 
                 if (showPercentage)
                 {
-                    string[] row8 = { "Progression", GameProgress.PercentageS };
+                    string[] row8 = { "Progression", GameProgress.PercentageString };
                     TrackerDataGrid.Rows.Add(row8);
                 }
 
-                if (TrackerDataGrid.Rows.Count >= 2)
-                {
-                    TrackerDataGrid.Height = (TrackerDataGrid.Rows[0].Height * (TrackerDataGrid.Rows.Count + 1));
-                    this.Height = TrackerDataGrid.Size.Height + WindowHeaderHeight;
-                }
+                TrackerDataGrid.Height = (TrackerDataGrid.Rows[0].Height * (TrackerDataGrid.Rows.Count + 1));
+                this.Height = TrackerDataGrid.Size.Height + WindowHeaderHeight;
 
                 // refresh
                 TrackerDataGrid.Invalidate();

@@ -14,6 +14,14 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         private Process DARKSOULS { get; set; }
         private IntPtr HANDLE { get; set; }
 
+        public bool IsAlive
+        {
+            get
+            {
+                return (GetProcess(WindowName) != null);
+            }
+        }
+
         public MemoryTools(string ProcessName)
         {
             this.WindowName = ProcessName;

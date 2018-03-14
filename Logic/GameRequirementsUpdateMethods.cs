@@ -11,6 +11,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
     {
         private void UpdateAllRequirements()
         {
+            double oldPercentage = gameProgress.Percentage;
             // Updates all requirements
             foreach (Requirement r in gameProgress.Requirements)
             {
@@ -19,7 +20,10 @@ namespace Livesplit.DarkSouls100Tracker.Logic
 
             // Done
             gameProgress.UpdatePercentage();
-            this.OnGameProgressUpdated(gameProgress, EventArgs.Empty);
+            //MessageBox.Show(gameProgress.PercentageString);
+
+            if (!cancellationTokenSource.IsCancellationRequested)
+                this.OnGameProgressUpdated?.Invoke(gameProgress, EventArgs.Empty);
         }
 
         // Items

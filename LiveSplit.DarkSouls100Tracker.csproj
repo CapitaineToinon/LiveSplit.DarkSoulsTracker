@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\Livesplit\Components\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\AssemblyGenerator.cs" />
-    <Compile Include="Logic\Constants.cs" />
     <Compile Include="Logic\DarkSoulsWrongExeType.cs" />
     <Compile Include="Logic\Dictionaries.cs" />
     <Compile Include="Logic\Flags.cs" />

@@ -13,7 +13,8 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         private enum GameState
         {
             Unhooked,
-            CheckIfUpdatable,
+            Waiting,
+            Updatable,
             NeedsUnhookAndClean
         }
         private GameState gameState;
@@ -28,30 +29,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         {
             memoryTools = new MemoryTools("DARK SOULS");
             gameState = GameState.Unhooked;
-
-            mainThread = new Thread(() =>
-            {
-                while (!cancellationTokenSource.IsCancellationRequested)
-                {
-                    Thread.Sleep(Constants.Thread_Frequency);
-                    Next();
-                }
-            })
-            {
-                IsBackground = true
-            };
-
-            gameProgress = new GameProgress(new List<Requirement>()
-            {
-                { new Requirement("Treasure Locations", 0.2, UpdatePickedUpItems) },
-                { new Requirement("Bosses", 0.25, UpdateDefetedBosses) },
-                { new Requirement("Non-respawning Enemies", 0.15, UpdateKilledNonRespawningEnemies) },
-                { new Requirement("NPC Questlines", 0.2, UpdateCompletedQuestlines) },
-                { new Requirement("Shortcuts / Locked Doors", 0.1, UpdateUnlockedShortcutsAndLockedDoors) },
-                { new Requirement("Illusory Walls", 0.025, ReleavedIllusoryWalls) },
-                { new Requirement("Foggates", 025, UpdateDissolvedFoggates) },
-                { new Requirement("Kindled Bonfires", 0.05, UpdateFullyKindledBonfires) },
-            });
+            mainThread = new Thread(() => { });
         }
 
         public void Start()
@@ -59,13 +37,17 @@ namespace Livesplit.DarkSouls100Tracker.Logic
             if (!mainThread.IsAlive)
             {
                 cancellationTokenSource = new CancellationTokenSource();
+                mainThread = new Thread(MainThreadFunction)
+                {
+                    IsBackground = true
+                };
                 mainThread.Start();
             }
         }
 
         public void Stop()
         {
-            if (mainThread.IsAlive && cancellationTokenSource != null)
+            if (cancellationTokenSource != null)
             {
                 cancellationTokenSource.Cancel();
             }
@@ -80,11 +62,21 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                     // Hooks the game and switch to CheckIfUpdatable if successful
                     if (memoryTools.Hook())
                     {
-                        gameState = GameState.CheckIfUpdatable;
+                        gameState = GameState.Waiting;
                     }
                     break;
 
-                case GameState.CheckIfUpdatable:
+                case GameState.Waiting:
+                    // Waits for IGT to start ticking
+                    int Waiting_IGT = GetIngameTimeInMilliseconds();
+                    bool Waiting_InOwnWorld = IsPlayerInOwnWorld();
+                    if (Waiting_IGT != 0 && Waiting_InOwnWorld)
+                    {
+                        gameState = GameState.Updatable;
+                    }
+                    break;
+
+                case GameState.Updatable:
 
                     // Checks IGT
                     int IGT = GetIngameTimeInMilliseconds();
@@ -95,10 +87,10 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                     {
                         gameState = GameState.NeedsUnhookAndClean;
                     }
-                    // Do nothing if in the main menu
+                    // Wait for IGT to start ticking again if in main menu
                     else if (IGT == 0 && !InOwnWorld)
                     {
-                        // ...
+                        gameState = GameState.Waiting;
                     }
                     // Otherwise we can test if updatable
                     else
@@ -121,6 +113,54 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                     gameState = GameState.NeedsUnhookAndClean;
                     break;
             }
+
+            // When the stop is done, check if the game is still alive
+            if (!memoryTools.IsAlive)
+            {
+                // unhooks if it's the case
+                gameState = GameState.NeedsUnhookAndClean;
+            }
+        }
+
+        private void MainThreadFunction()
+        {
+            gameState = GameState.Unhooked;
+            gameProgress = new GameProgress(new List<Requirement>()
+            {
+                { new Requirement("Treasure Locations", 0.2, UpdatePickedUpItems) },
+                { new Requirement("Bosses", 0.25, UpdateDefetedBosses) },
+                { new Requirement("Non-respawning Enemies", 0.15, UpdateKilledNonRespawningEnemies) },
+                { new Requirement("NPC Questlines", 0.2, UpdateCompletedQuestlines) },
+                { new Requirement("Shortcuts / Locked Doors", 0.1, UpdateUnlockedShortcutsAndLockedDoors) },
+                { new Requirement("Illusory Walls", 0.025, ReleavedIllusoryWalls) },
+                { new Requirement("Foggates", 0.025, UpdateDissolvedFoggates) },
+                { new Requirement("Kindled Bonfires", 0.05, UpdateFullyKindledBonfires) },
+            });
+
+            this.OnGameProgressUpdated?.Invoke(gameProgress, EventArgs.Empty);
+
+            // Next
+            while (!cancellationTokenSource.IsCancellationRequested)
+            {
+                // Thread.Sleep(Constants.Thread_Frequency);
+                Thread.Sleep(16);
+                //MessageBox.Show(gameState.ToString());
+                Next();
+            }
+
+            MessageBox.Show("Nique tes parents putain de merde gros fdp");
+            this.OnGameProgressUpdated(new GameProgress(), EventArgs.Empty);
+
+            // Thread cancel
+            if (memoryTools.IsAlive)
+            {
+                memoryTools.UnHook();
+            }
+
+            memoryTools.ClearMemory();
+            gameState = GameState.Unhooked;
+
+            
         }
 
         private bool IsPlayerInOwnWorld()
