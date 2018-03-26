@@ -77,7 +77,6 @@
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Logic\DarkSoulsProcess.cs" />
     <Compile Include="Tools\Dictionnaries.cs" />
-    <Compile Include="Tools\EmbeddedAssembly.cs" />
     <Compile Include="Tools\Flags.cs" />
     <Compile Include="Logic\GameProgress.cs" />
     <Compile Include="DarkSoulsMemory.cs" />
