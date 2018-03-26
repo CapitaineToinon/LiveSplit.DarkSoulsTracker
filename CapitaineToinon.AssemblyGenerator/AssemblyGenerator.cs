@@ -1,15 +1,10 @@
-﻿/**
- * Magic code original made in Visual Basic by Wulf2k : 
- * https://github.com/Wulf2k/DS-EventHook/blob/master/DS-EventHook/asm.vb
- * Converts Assembly code to raw bytes
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Livesplit.DarkSouls100Tracker.Logic
+namespace CapitaineToinon
 {
-    class AssemblyGenerator
+    public class AssemblyGenerator
     {
         private byte[] bytes;
         public Int32 pos;

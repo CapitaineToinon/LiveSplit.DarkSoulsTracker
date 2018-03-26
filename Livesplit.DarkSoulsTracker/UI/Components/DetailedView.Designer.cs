@@ -39,6 +39,9 @@
             // 
             this.TrackerDataGrid.AllowUserToAddRows = false;
             this.TrackerDataGrid.AllowUserToDeleteRows = false;
+            this.TrackerDataGrid.AllowUserToResizeColumns = false;
+            this.TrackerDataGrid.AllowUserToResizeRows = false;
+            this.TrackerDataGrid.BackgroundColor = System.Drawing.Color.Black;
             this.TrackerDataGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TrackerDataGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.TrackerDataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -61,6 +64,7 @@
             this.TrackerDataGrid.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.TrackerDataGrid.Size = new System.Drawing.Size(357, 150);
             this.TrackerDataGrid.TabIndex = 0;
+            this.TrackerDataGrid.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TrackerDataGrid_MouseDown);
             // 
             // name
             // 

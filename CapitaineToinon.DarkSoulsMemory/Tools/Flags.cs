@@ -1,6 +1,6 @@
-﻿namespace Livesplit.DarkSouls100Tracker.Logic
+﻿namespace CapitaineToinon.DarkSoulsMemory
 {
-    static class Flags
+    internal static class Flags
     {
         public static int[] TotalItemFlags = {51000000, 51000010, 51000020, 51000030, 51000040, 51000050, 51000090, 51000100, 51000120, 51000140,
                                     51000170, 51000180, 51000190, 51000210, 51000240, 51000500, 51010000, 51010020, 51010040, 51010050,

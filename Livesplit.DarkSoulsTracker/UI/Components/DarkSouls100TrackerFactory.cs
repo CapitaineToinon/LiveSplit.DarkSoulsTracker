@@ -41,7 +41,7 @@ namespace LiveSplit.UI.Components
 
         public IComponent Create(LiveSplitState state)
         {
-            return new DarkSouls100TrackerComponent(state);
+            return new DarkSouls100Tracker(state);
         }
 
         public string XMLURL

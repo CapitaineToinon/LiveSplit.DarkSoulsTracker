@@ -1,10 +1,7 @@
 ﻿using LiveSplit.Model;
-using LiveSplit.Model.Comparisons;
 using LiveSplit.TimeFormatters;
-using LiveSplit.UI;
 using System;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -19,10 +16,22 @@ namespace LiveSplit.UI.Components
         public Color TextColor { get; set; }
         public bool OverrideTextColor { get; set; }
 
-        public TimeAccuracy Accuracy { get; set; }
-
+        private TimeAccuracy accuracy;
         private bool showPercetnage;
         private bool darkTheme;
+
+        public TimeAccuracy Accuracy
+        {
+            get
+            {
+                return accuracy;
+            }
+            set
+            {
+                accuracy = value;
+                this.OnDetailedSettingsChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
         public bool ShowPercentage
         {
             get
@@ -32,7 +41,7 @@ namespace LiveSplit.UI.Components
             set
             {
                 showPercetnage = value;
-                this.OnDetailedSettingsChanged(this, EventArgs.Empty);
+                this.OnDetailedSettingsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
         public bool DarkTheme
@@ -44,7 +53,7 @@ namespace LiveSplit.UI.Components
             set
             {
                 darkTheme = value;
-                this.OnDetailedSettingsChanged(this, EventArgs.Empty);
+                this.OnDetailedSettingsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
         public bool OpenAtLaunch { get; set; }
@@ -94,14 +103,14 @@ namespace LiveSplit.UI.Components
             chkOpenAtLaunch.DataBindings.Add("Checked", this, "OpenAtLaunch", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
-        void chkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
+        void ChkOverrideTextColor_CheckedChanged(object sender, EventArgs e)
         {
             TextLabel.Enabled = btnTextColor.Enabled = chkOverrideTextColor.Checked;
         }
 
         void DeltaSettings_Load(object sender, EventArgs e)
         {
-            chkOverrideTextColor_CheckedChanged(null, null);
+            ChkOverrideTextColor_CheckedChanged(null, null);
 
             rdoSeconds.Checked = Accuracy == TimeAccuracy.Seconds;
             rdoTenths.Checked = Accuracy == TimeAccuracy.Tenths;
@@ -121,12 +130,12 @@ namespace LiveSplit.UI.Components
             }
         }
 
-        void rdoHundredths_CheckedChanged(object sender, EventArgs e)
+        void RdoHundredths_CheckedChanged(object sender, EventArgs e)
         {
             UpdateAccuracy();
         }
 
-        void rdoSeconds_CheckedChanged(object sender, EventArgs e)
+        void RdoSeconds_CheckedChanged(object sender, EventArgs e)
         {
             UpdateAccuracy();
         }
@@ -162,7 +171,7 @@ namespace LiveSplit.UI.Components
         {
             var parent = document.CreateElement("Settings");
             CreateSettingsNode(document, parent);
-            this.OnSettingsLoaded(this, EventArgs.Empty);
+            this.OnSettingsLoaded?.Invoke(this, EventArgs.Empty);
             return parent;
         }
 
@@ -193,12 +202,12 @@ namespace LiveSplit.UI.Components
             SettingsHelper.ColorButtonClick((Button)sender, this);
         }
 
-        private void btnDetails_Click(object sender, EventArgs e)
+        private void BtnDetails_Click(object sender, EventArgs e)
         {
-            this.OnToggleDetails(sender, EventArgs.Empty);
+            this.OnToggleDetails?.Invoke(sender, EventArgs.Empty);
         }
 
-        private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
+        private void CmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnColor1.Visible = cmbGradientType.SelectedItem.ToString() != "Plain";
             btnColor2.DataBindings.Clear();

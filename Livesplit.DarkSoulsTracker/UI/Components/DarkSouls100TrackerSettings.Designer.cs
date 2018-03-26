@@ -148,7 +148,7 @@
             this.cmbGradientType.Name = "cmbGradientType";
             this.cmbGradientType.Size = new System.Drawing.Size(239, 21);
             this.cmbGradientType.TabIndex = 34;
-            this.cmbGradientType.SelectedIndexChanged += new System.EventHandler(this.cmbGradientType_SelectedIndexChanged);
+            this.cmbGradientType.SelectedIndexChanged += new System.EventHandler(this.CmbGradientType_SelectedIndexChanged);
             // 
             // tableLayoutPanel3
             // 
@@ -212,7 +212,7 @@
             this.btnDetails.TabIndex = 0;
             this.btnDetails.Text = "Toggle Detailed Tracker";
             this.btnDetails.UseVisualStyleBackColor = true;
-            this.btnDetails.Click += new System.EventHandler(this.btnDetails_Click);
+            this.btnDetails.Click += new System.EventHandler(this.BtnDetails_Click);
             // 
             // groupBox2
             // 
@@ -254,7 +254,7 @@
             this.rdoHundredths.TabStop = true;
             this.rdoHundredths.Text = "Two";
             this.rdoHundredths.UseVisualStyleBackColor = true;
-            this.rdoHundredths.CheckedChanged += new System.EventHandler(this.rdoHundredths_CheckedChanged);
+            this.rdoHundredths.CheckedChanged += new System.EventHandler(this.RdoHundredths_CheckedChanged);
             // 
             // rdoTenths
             // 
@@ -279,7 +279,7 @@
             this.rdoSeconds.TabStop = true;
             this.rdoSeconds.Text = "None";
             this.rdoSeconds.UseVisualStyleBackColor = true;
-            this.rdoSeconds.CheckedChanged += new System.EventHandler(this.rdoSeconds_CheckedChanged);
+            this.rdoSeconds.CheckedChanged += new System.EventHandler(this.RdoSeconds_CheckedChanged);
             // 
             // groupBox4
             // 
@@ -346,7 +346,7 @@
             this.chkOverrideTextColor.TabIndex = 0;
             this.chkOverrideTextColor.Text = "Override Layout Settings";
             this.chkOverrideTextColor.UseVisualStyleBackColor = true;
-            this.chkOverrideTextColor.CheckedChanged += new System.EventHandler(this.chkOverrideTextColor_CheckedChanged);
+            this.chkOverrideTextColor.CheckedChanged += new System.EventHandler(this.ChkOverrideTextColor_CheckedChanged);
             // 
             // TextLabel
             // 

@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Livesplit.DarkSouls100Tracker.Logic
+namespace CapitaineToinon.DarkSoulsMemory
 {
-    public enum ExeTypes
+    internal enum HookingStates
+    {
+        Unhooked,
+        Hooked,
+        CheckingProcess,
+        Start,
+    }
+
+    internal enum GameVersion
     {
         Release,
         Debug,
-        Beta,
-        Unknown,
+        Unknown, // Who cares about beta
     }
 
-    public enum PointerType
+    internal enum PointerType
     {
         updateFullyKindledBonfires,
         GetClearCount,
@@ -21,7 +28,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         GetIngameTimeInMilliseconds
     }
 
-    public enum PlayerStartingClass
+    internal enum PlayerStartingClass
     {
         None = -1,
         Warrior = 0,
@@ -36,7 +43,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         Deprived = 9
     }
 
-    public enum PlayerCharacterType
+    internal enum PlayerCharacterType
     {
         None = -1,
         Human = 0,
@@ -45,7 +52,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         Hollow = 8
     }
 
-    public enum NPC
+    internal enum NPC
     {
         // NPCs not tied to questlines
         Andre = 1322,
@@ -80,82 +87,10 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         HollowedOscar = 1062,
     }
 
-    class Dictionaries
+    internal static class Dictionaries
     {
-        ExeTypes exeType;
-
-        public Dictionaries(ExeTypes exeType)
-        {
-            this.exeType = exeType;
-        }
-
-        #region Static
-        public static IntPtr GameVersion = (IntPtr)0x400080;
-        public static UInt32 Release = 0xFC293654;
-        public static UInt32 Debug = 0xCE9634B4;
-        public static UInt32 Beta = 0xE91B11E2;
-
-        public static Dictionary<string, IntPtr> GetHooks(ExeTypes type)
-        {
-            switch (type)
-            {
-                case ExeTypes.Release:
-                    return new Dictionary<string, IntPtr>()
-                    {
-                        { "geteventflagvalue", new IntPtr(0xD60340)},
-                        { "hook1", new IntPtr(0xBC1CEA)},
-                        { "hook1return", new IntPtr(0xBC1CEF)},
-                        { "hook1seteventflag", new IntPtr(0xD38CB0)},
-                    };
-                case ExeTypes.Debug:
-                    return new Dictionary<string, IntPtr>()
-                    {
-                        { "geteventflagvalue", new IntPtr(0xD618D0)},
-                        { "hook1", new IntPtr(0xBC23CA)},
-                        { "hook1return", new IntPtr(0xBC23CF)},
-                        { "hook1seteventflag", new IntPtr(0xD3A240)},
-                    };
-                default:
-                    return new Dictionary<string, IntPtr>();
-            }
-        }
-        #endregion
-
-        // PointerType that needs a pointer  
-        public Dictionary<PointerType, IntPtr> PointersTypes
-        {
-            get
-            {
-                switch (exeType)
-                {
-                    case ExeTypes.Release:
-                        return new Dictionary<PointerType, IntPtr>
-                    {
-                        { PointerType.updateFullyKindledBonfires,   (IntPtr)0x137E204 },
-                        { PointerType.GetClearCount,                (IntPtr)0x1378700 },
-                        { PointerType.IsPlayerLoaded,               (IntPtr)0x137DC70 },
-                        { PointerType.GetPlayerStartingClass,       (IntPtr)0x1378700 },
-                        { PointerType.GetPlayerCharacterType,       (IntPtr)0x137E204 },
-                        { PointerType.GetIngameTimeInMilliseconds,  (IntPtr)0x1378700 },
-                    };
-                    case ExeTypes.Debug:
-                        return new Dictionary<PointerType, IntPtr>
-                    {
-                        { PointerType.updateFullyKindledBonfires,   (IntPtr)0x13823C4 },
-                        { PointerType.GetClearCount,                (IntPtr)0x137C8C0 },
-                        { PointerType.IsPlayerLoaded,               (IntPtr)0x1381E30 },
-                        { PointerType.GetPlayerStartingClass,       (IntPtr)0x137C8C0 },
-                        { PointerType.GetPlayerCharacterType,       (IntPtr)0x13823C4 },
-                        { PointerType.GetIngameTimeInMilliseconds,  (IntPtr)0x137C8C0 },
-                    };
-                    default:
-                        return new Dictionary<PointerType, IntPtr>();
-                }
-            }
-        }
-
         // Dictionary for the starting items in Asylum. Key is the starting class, values are the starting item flags
-        public Dictionary<PlayerStartingClass, int[]> StartingClassItems
+        public static Dictionary<PlayerStartingClass, int[]> StartingClassItems
         {
             get
             {
@@ -170,7 +105,8 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                     { PlayerStartingClass.Sorcerer, new int[] { 51810240, 51810230, 51810250 } },
                     { PlayerStartingClass.Pyromancer, new int[] { 51810270, 51810260, 51810280 } },
                     { PlayerStartingClass.Cleric, new int[] { 51810300, 51810290, 51810310 } },
-                    { PlayerStartingClass.Deprived, new int[] { 51810330, 51810320 } }
+                    { PlayerStartingClass.Deprived, new int[] { 51810330, 51810320 } },
+                    { PlayerStartingClass.None, new int[] { } }
                 };
             }
         }
@@ -178,7 +114,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
 
 
         // Dictionary for the dropped item flags of each NPC. Key is the dead flag for each NPC, values are the dropped item flags
-        public Dictionary<NPC, int[]> NpcDroppedItems
+        public static Dictionary<NPC, int[]> NpcDroppedItems
         {
             get
             {
@@ -219,7 +155,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
 
 
         // Dictionary for the hostile flags of each NPC that isn't tied to a questline. Key is just an index, values are the hostile and dead flags
-        public List<int[]> NpcHostileDeadFlags
+        public static List<int[]> NpcHostileDeadFlags
         {
             get
             {
@@ -244,7 +180,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
 
 
         // Dictionary for treasure locations that have multiple pickups/event flags associated with it. Key is the first flag, values are the remaining flags
-        public Dictionary<int, int[]> SharedTreasureLocationItems
+        public static Dictionary<int, int[]> SharedTreasureLocationItems
         {
             get
             {
