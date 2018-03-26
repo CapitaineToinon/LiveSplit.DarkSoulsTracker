@@ -1,35 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Livesplit.DarkSouls100Tracker.Logic
+namespace CapitaineToinon.DarkSoulsMemory
 {
-    public static class Constants
+    internal enum HookingStates
     {
-        public const int PROCESS_VM_READ = 0x10;
-        public const int TH32CS_SNAPPROCESS = 0x2;
-        public const int MEM_COMMIT = 4096;
-        public const int MEM_RELEASE = 0x8000;
-        public const int PAGE_READWRITE = 4;
-        public const int PAGE_EXECUTE_READWRITE = 0x40;
-        public const int PROCESS_CREATE_THREAD = (0x2);
-        public const int PROCESS_VM_OPERATION = (0x8);
-        public const int PROCESS_VM_WRITE = (0x20);
-        public const int PROCESS_ALL_ACCESS = 0x1F0FFF;
-
-        // in milliseconds
-        public const int Thread_Frequency = 33;
-        public const int BONFIRE_FULLY_KINDLED = 40;
+        Unhooked,
+        Hooked,
+        CheckingProcess,
+        Start,
     }
 
-    public enum ExeTypes
+    internal enum GameVersion
     {
         Release,
         Debug,
-        Beta,
-        Unknown,
+        Unknown, // Who cares about beta
     }
 
-    public enum PointerType
+    internal enum PointerType
     {
         updateFullyKindledBonfires,
         GetClearCount,
@@ -39,7 +28,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         GetIngameTimeInMilliseconds
     }
 
-    public enum PlayerStartingClass
+    internal enum PlayerStartingClass
     {
         None = -1,
         Warrior = 0,
@@ -54,7 +43,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         Deprived = 9
     }
 
-    public enum PlayerCharacterType
+    internal enum PlayerCharacterType
     {
         None = -1,
         Human = 0,
@@ -63,7 +52,7 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         Hollow = 8
     }
 
-    public enum NPC
+    internal enum NPC
     {
         // NPCs not tied to questlines
         Andre = 1322,
@@ -98,56 +87,8 @@ namespace Livesplit.DarkSouls100Tracker.Logic
         HollowedOscar = 1062,
     }
 
-    static class Dictionaries
+    internal static class Dictionaries
     {
-        public static IntPtr GameVersion = (IntPtr)0x400080;
-        public static UInt32 Release = 0xFC293654;
-        public static UInt32 Debug = 0xCE9634B4;
-        public static UInt32 Beta = 0xE91B11E2;
-
-        public static Dictionary<ExeTypes, IntPtr> EventFlagValues
-        {
-            get
-            {
-                return new Dictionary<ExeTypes, IntPtr>
-                {
-                    { ExeTypes.Release, new IntPtr(0xD60340) },
-                    { ExeTypes.Debug, new IntPtr(0xD618D0) },
-                };
-            }
-        }
-
-        // PointerType that needs a pointer  
-        public static Dictionary<ExeTypes, Dictionary<PointerType, IntPtr>> PointersTypes
-        {
-            get
-            {
-                return new Dictionary<ExeTypes, Dictionary<PointerType, IntPtr>>
-                {
-                    { ExeTypes.Release, new Dictionary<PointerType, IntPtr>
-                        {
-                            { PointerType.updateFullyKindledBonfires,   (IntPtr)0x137E204 },
-                            { PointerType.GetClearCount,                (IntPtr)0x1378700 },
-                            { PointerType.IsPlayerLoaded,               (IntPtr)0x137DC70 },
-                            { PointerType.GetPlayerStartingClass,       (IntPtr)0x1378700 },
-                            { PointerType.GetPlayerCharacterType,       (IntPtr)0x137E204 },
-                            { PointerType.GetIngameTimeInMilliseconds,  (IntPtr)0x1378700 },
-                        }
-                    },
-                    { ExeTypes.Debug, new Dictionary<PointerType, IntPtr>
-                        {
-                            { PointerType.updateFullyKindledBonfires,   (IntPtr)0x13823C4 },
-                            { PointerType.GetClearCount,                (IntPtr)0x137C8C0 },
-                            { PointerType.IsPlayerLoaded,               (IntPtr)0x1381E30 },
-                            { PointerType.GetPlayerStartingClass,       (IntPtr)0x137C8C0 },
-                            { PointerType.GetPlayerCharacterType,       (IntPtr)0x13823C4 },
-                            { PointerType.GetIngameTimeInMilliseconds,  (IntPtr)0x137C8C0 },
-                        }
-                    },
-                };
-            }
-        }
-
         // Dictionary for the starting items in Asylum. Key is the starting class, values are the starting item flags
         public static Dictionary<PlayerStartingClass, int[]> StartingClassItems
         {
@@ -164,7 +105,8 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                     { PlayerStartingClass.Sorcerer, new int[] { 51810240, 51810230, 51810250 } },
                     { PlayerStartingClass.Pyromancer, new int[] { 51810270, 51810260, 51810280 } },
                     { PlayerStartingClass.Cleric, new int[] { 51810300, 51810290, 51810310 } },
-                    { PlayerStartingClass.Deprived, new int[] { 51810330, 51810320 } }
+                    { PlayerStartingClass.Deprived, new int[] { 51810330, 51810320 } },
+                    { PlayerStartingClass.None, new int[] { } }
                 };
             }
         }
@@ -209,6 +151,8 @@ namespace Livesplit.DarkSouls100Tracker.Logic
                 };
             }
         }
+
+
 
         // Dictionary for the hostile flags of each NPC that isn't tied to a questline. Key is just an index, values are the hostile and dead flags
         public static List<int[]> NpcHostileDeadFlags
