@@ -52,13 +52,14 @@ namespace CapitaineToinon.DarkSoulsMemory
             }
 
             // Thread got canceled
+            mainThread = null;
         }
 
         public void Start()
         {
             this.darksouls.OnGameProgressUpdated += Darksouls_OnGameProgressUpdated;
             tokenSource = new CancellationTokenSource();
-            if (mainThread == null || !mainThread.IsAlive)
+            if (mainThread == null)
             {
                 mainThread = new Thread(() => MainThreadFunction(ref tokenSource))
                 {

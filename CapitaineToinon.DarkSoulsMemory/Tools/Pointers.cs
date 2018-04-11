@@ -21,6 +21,18 @@ namespace CapitaineToinon.DarkSoulsMemory
         public const int CharData1Ptr3 = 0x0;
         #endregion
 
+        public static Dictionary<GameVersion, int> EventFlagPtr
+        {
+            get
+            {
+                return new Dictionary<GameVersion, int>
+                {
+                    { GameVersion.Release, 0x137D7D4 },
+                    { GameVersion.Debug, 0x1381994 },
+                };
+            }
+        }
+
         public static Dictionary<GameVersion, IntPtr> EventFlagValues
         {
             get

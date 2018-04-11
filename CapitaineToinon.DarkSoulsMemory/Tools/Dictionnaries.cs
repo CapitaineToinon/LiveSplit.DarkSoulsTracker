@@ -89,6 +89,36 @@ namespace CapitaineToinon.DarkSoulsMemory
 
     internal static class Dictionaries
     {
+        public static Dictionary<string, int> EventFlagGroups = new Dictionary<string, int>()
+        {
+            {"0", 0x00000},
+            {"1", 0x00500},
+            {"5", 0x05F00},
+            {"6", 0x0B900},
+            {"7", 0x11300},
+        };
+
+        public static Dictionary<string, int> EventFlagAreas = new Dictionary<string, int>()
+        {
+            {"000", 00},
+            {"100", 01},
+            {"101", 02},
+            {"102", 03},
+            {"110", 04},
+            {"120", 05},
+            {"121", 06},
+            {"130", 07},
+            {"131", 08},
+            {"132", 09},
+            {"140", 10},
+            {"141", 11},
+            {"150", 12},
+            {"151", 13},
+            {"160", 14},
+            {"170", 15},
+            {"180", 16},
+            {"181", 17},
+        };
         // Dictionary for the starting items in Asylum. Key is the starting class, values are the starting item flags
         public static Dictionary<PlayerStartingClass, int[]> StartingClassItems
         {

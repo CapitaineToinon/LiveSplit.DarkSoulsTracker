@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Microsoft.Win32.SafeHandles;
 using System.Diagnostics;
 
 namespace CapitaineToinon.DarkSoulsMemory
@@ -13,8 +12,8 @@ namespace CapitaineToinon.DarkSoulsMemory
         private GameProgress progress;
 
         private Process darksouls;
-        private SafeProcessHandle safeHandle;
-        private IntPtr getflagfunmem;
+        private IntPtr darksoulsHandle;
+
         private GameVersion gameVersion;
         private HookingStates state;
         #endregion
@@ -23,7 +22,7 @@ namespace CapitaineToinon.DarkSoulsMemory
         public DarkSoulsProcess()
         {
             this.state = HookingStates.Start;
-            this.safeHandle = null;
+            this.darksoulsHandle = IntPtr.Zero;
 
             this.progress = new GameProgress(new List<Requirement>()
             {
@@ -40,7 +39,7 @@ namespace CapitaineToinon.DarkSoulsMemory
 
         ~DarkSoulsProcess()
         {
-            
+
         }
         #endregion
 
@@ -73,7 +72,7 @@ namespace CapitaineToinon.DarkSoulsMemory
                         state = HookingStates.CheckingProcess;
                     }
                     break;
-                
+
                 // Before updating the progress, we verify that the game is running up and running
                 // Deallocates the asm memory if it's not the case and switch back to Unhooked
                 // If the game is still present, this will bounce back and forth with Hooked
@@ -81,7 +80,7 @@ namespace CapitaineToinon.DarkSoulsMemory
                     if (!IsGameRunning())
                     {
                         // Process is gone
-                        Deallocate();
+                        Reset();
                         state = HookingStates.Unhooked;
                     }
                     else
@@ -140,7 +139,7 @@ namespace CapitaineToinon.DarkSoulsMemory
         private bool IsGameRunning()
         {
             // Returns false is the game was closed / crashed
-            return !(safeHandle.IsClosed || safeHandle.IsInvalid || darksouls.HasExited);
+            return !(darksouls.HasExited);
         }
         #endregion
 
@@ -152,8 +151,7 @@ namespace CapitaineToinon.DarkSoulsMemory
             {
                 // Dark Souls found! Save the process, safeHandle and allocates the ASM memory
                 darksouls = tmp;
-                safeHandle = darksouls.SafeHandle;
-                getflagfunmem = GetFlagsInit();
+                darksoulsHandle = darksouls.Handle;
                 return true;
             }
             else
@@ -162,23 +160,16 @@ namespace CapitaineToinon.DarkSoulsMemory
             }
         }
 
-        private void Deallocate()
+        private void Reset()
         {
-            // If the game is already closed, then the memory is already deallocated
-            if (darksouls != null && !darksouls.HasExited)
-            {
-                Kernel.VirtualFreeEx(safeHandle, getflagfunmem, 0, Constants.MEM_RELEASE);
-                darksouls.Dispose();
-            }
             darksouls = null;
-            safeHandle = null;
-            getflagfunmem = IntPtr.Zero;
+            darksoulsHandle = IntPtr.Zero;
+            state = HookingStates.Start;
         }
 
         public void Quit()
         {
-            Deallocate();
-            state = HookingStates.Start;
+            Reset();
             progress.Reset();
             progress.OnGameProgressUpdated -= Progress_OnGameProgressUpdated;
         }
@@ -190,8 +181,7 @@ namespace CapitaineToinon.DarkSoulsMemory
 
             foreach (Process candidate in candidates)
             {
-                SafeProcessHandle c = candidate.SafeHandle;
-                UInt32 value = MemoryTools.RUInt32(c, (IntPtr)Pointers.VERSION_CHECK);
+                UInt32 value = MemoryTools.RUInt32(candidate.Handle, (IntPtr)Pointers.VERSION_CHECK);
                 switch (value)
                 {
                     case Pointers.VERSION_RELEASE:
@@ -216,77 +206,46 @@ namespace CapitaineToinon.DarkSoulsMemory
         #endregion
 
         #region Flags Methods
-        /// <summary>
-        /// Returns true if a Flag is set
-        /// </summary>
-        /// <param name="eventID"></param>
-        /// <returns></returns>
-        private bool GetEventFlagState(int eventID)
+        private bool GetEventFlagAddress(int ID, out int address, out uint mask)
         {
-            // Write the flag ID in the ASM memory
-            MemoryTools.WInt32(safeHandle, getflagfunmem + 0x400, eventID);
-
-            // Execute the ASM memory
-            IntPtr newThreadHook = (IntPtr)Kernel.CreateRemoteThread(safeHandle, 0, 0, (int)getflagfunmem, 0, 0, 0);
-            Kernel.WaitForSingleObject(newThreadHook, 0xFFFFFFFFU);
-            Kernel.CloseHandle(newThreadHook);
-
-            // Read the returned value and check if the highest bit is set
-            int a = MemoryTools.RInt32(safeHandle, getflagfunmem + 0x404);
-            return (a >> 7) == 1;
-        }
-
-        /// <summary>
-        /// Allocates a memory region and puts the required assembly code
-        /// to read Event Flags. Returns the memory allocated.
-        /// </summary>
-        /// <returns></returns>
-        private IntPtr GetFlagsInit()
-        {
-            IntPtr memory = Kernel.VirtualAllocEx(safeHandle, (IntPtr)0, (IntPtr)0x8000, Constants.MEM_COMMIT, Constants.PAGE_EXECUTE_READWRITE);
-            Kernel.VirtualProtectEx(safeHandle, memory, (UIntPtr)0x8000, Constants.PAGE_EXECUTE_READWRITE, out uint oldProtectionOutFunc);
-
-            // Using DarkSoulsFlagsInjector.dll, the VB code memes by Wulf :thinking:
-            AssemblyGenerator a = new AssemblyGenerator();
-
-            a.AddVar("newmem", memory);
-            a.AddVar("vardump", memory + 0x400);
-
-            a.pos = (int)(memory);
-            a.Asm("pushad");
-            a.Asm("mov eax, vardump");
-            a.Asm("mov eax, [eax]");
-            a.Asm("push eax");
-            a.Asm("call 0x" + Pointers.GET_EVENT_FLAG.ToString("X"));
-            a.Asm("mov ecx, vardump");
-            a.Asm("add ecx, 4");
-            a.Asm("mov [ecx], eax");
-            a.Asm("add ecx, 4");
-            a.Asm("mov eax, 1");
-            a.Asm("mov [ecx], eax");
-            a.Asm("popad");
-            a.Asm("ret");
-
-            WriteCodeAndFlushCache(safeHandle, memory, a.Bytes, a.Bytes.Length, 0);
-
-            return memory;
-        }
-
-        bool WriteCodeAndFlushCache(SafeProcessHandle hProcess, IntPtr lpBaseAddress, Byte[] lpBuffer, int iSize, int lpNumberOfBytesWritten)
-        {
-            bool result = Kernel.WriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, iSize, ref lpNumberOfBytesWritten);
-            if (!Kernel.FlushInstructionCache(hProcess, lpBaseAddress, (UIntPtr)iSize))
+            string idString = ID.ToString("D8");
+            if (idString.Length == 8)
             {
-                throw new Exception("Flush Instruction Cache Failed");
+                string group = idString.Substring(0, 1);
+                string area = idString.Substring(1, 3);
+                int section = Int32.Parse(idString.Substring(4, 1));
+                int number = Int32.Parse(idString.Substring(5, 3));
+
+                if (Dictionaries.EventFlagGroups.ContainsKey(group) && Dictionaries.EventFlagAreas.ContainsKey(area))
+                {
+                    int offset = Dictionaries.EventFlagGroups[group];
+                    offset += Dictionaries.EventFlagAreas[area] * 0x500;
+                    offset += section * 128;
+                    offset += (number - (number % 32)) / 8;
+
+                    address = MemoryTools.RInt32(darksoulsHandle, (IntPtr)Pointers.EventFlagPtr[gameVersion]);
+                    address = MemoryTools.RInt32(darksoulsHandle, (IntPtr)address);
+                    address += offset;
+
+                    mask = 0x80000000 >> (number % 32);
+                    return true;
+                }
             }
-            return result;
+
+            address = 0;
+            mask = 0;
+            return false;
         }
 
-        private void Execute(SafeProcessHandle Handle, IntPtr Address)
+        public bool GetEventFlagState(int ID)
         {
-            IntPtr newThreadHook = (IntPtr)Kernel.CreateRemoteThread(Handle, 0, 0, (int)Address, 0, 0, 0);
-            Kernel.WaitForSingleObject(newThreadHook, 0xFFFFFFFFU);
-            Kernel.CloseHandle(newThreadHook);
+            if (GetEventFlagAddress(ID, out int address, out uint mask))
+            {
+                uint flags = (uint)MemoryTools.RInt32(darksoulsHandle, (IntPtr)address);
+                return (flags & mask) != 0;
+            }
+            else
+                return false;
         }
         #endregion
 
@@ -299,13 +258,13 @@ namespace CapitaineToinon.DarkSoulsMemory
 
         private bool IsPlayerLoaded()
         {
-            return MemoryTools.RInt32(safeHandle, (IntPtr)Pointers.CharData1Ptr) != 0;
+            return MemoryTools.RInt32(darksoulsHandle, (IntPtr)Pointers.CharData1Ptr) != 0;
         }
 
         private PlayerStartingClass GetPlayerStartingClass()
         {
             IntPtr ptr = Pointers.PointersTypes[gameVersion][PointerType.GetPlayerStartingClass];
-            ptr = (IntPtr)MemoryTools.RUInt32(safeHandle, ptr);
+            ptr = (IntPtr)MemoryTools.RUInt32(darksoulsHandle, ptr);
 
             if (ptr == IntPtr.Zero)
             {
@@ -313,8 +272,8 @@ namespace CapitaineToinon.DarkSoulsMemory
             }
             else
             {
-                ptr = (IntPtr)MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 8));
-                int t = MemoryTools.RBytes(safeHandle, IntPtr.Add(ptr, 0xC6), 1)[0];
+                ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 8));
+                int t = MemoryTools.RBytes(darksoulsHandle, IntPtr.Add(ptr, 0xC6), 1)[0];
                 return (Enum.IsDefined(typeof(PlayerStartingClass), t)) ? (PlayerStartingClass)t : PlayerStartingClass.None;
             }
         }
@@ -322,8 +281,8 @@ namespace CapitaineToinon.DarkSoulsMemory
         private int GetIngameTimeInMilliseconds()
         {
             IntPtr ptr = Pointers.PointersTypes[gameVersion][PointerType.GetIngameTimeInMilliseconds];
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, ptr);
-            return MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 0x68));
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, ptr);
+            return MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 0x68));
 
         }
 
@@ -335,11 +294,11 @@ namespace CapitaineToinon.DarkSoulsMemory
         private int GetClearCount()
         {
             IntPtr ptr = Pointers.PointersTypes[gameVersion][PointerType.GetClearCount];
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, ptr);
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, ptr);
             if (ptr == IntPtr.Zero)
                 return -1;
             else
-                return MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 0x3C));
+                return MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 0x3C));
         }
 
         private PlayerCharacterType GetPlayerCharacterType()
@@ -351,7 +310,7 @@ namespace CapitaineToinon.DarkSoulsMemory
             }
             else
             {
-                int t = MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 0xA28));
+                int t = MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 0xA28));
                 return (Enum.IsDefined(typeof(PlayerCharacterType), t)) ? (PlayerCharacterType)t : PlayerCharacterType.None;
             }
         }
@@ -534,22 +493,22 @@ namespace CapitaineToinon.DarkSoulsMemory
         {
             IntPtr ptr = Pointers.PointersTypes[gameVersion][PointerType.updateFullyKindledBonfires];
 
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, ptr);
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 0xB48));
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 0x24));
-            ptr = (IntPtr)MemoryTools.RInt32(safeHandle, ptr);
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, ptr);
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 0xB48));
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 0x24));
+            ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, ptr);
 
             int kindledBonfires = 0;
             //  'Bonfires accessible in this way are only the ones the player has been able to access at some point
             //  'Once it reaches the end of the list, the bonfireID is 0 and then it loops back around
             //  'So reaching bonfirePtr = IntPtr.Zero means the loop has to end
             int bonfireID = 0;
-            IntPtr bonfirePtr = (IntPtr)MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 8));
+            IntPtr bonfirePtr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 8));
 
             while (bonfirePtr != IntPtr.Zero)
             {
-                bonfireID = MemoryTools.RInt32(safeHandle, IntPtr.Add(bonfirePtr, 4));
-                int kindledState = MemoryTools.RInt32(safeHandle, IntPtr.Add(bonfirePtr, 8));
+                bonfireID = MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(bonfirePtr, 4));
+                int kindledState = MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(bonfirePtr, 8));
 
                 if (kindledState == Constants.BONFIRE_FULLY_KINDLED)
                 {
@@ -569,8 +528,8 @@ namespace CapitaineToinon.DarkSoulsMemory
                     }
                 }
 
-                ptr = (IntPtr)MemoryTools.RInt32(safeHandle, ptr);
-                bonfirePtr = (IntPtr)MemoryTools.RInt32(safeHandle, IntPtr.Add(ptr, 8));
+                ptr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, ptr);
+                bonfirePtr = (IntPtr)MemoryTools.RInt32(darksoulsHandle, IntPtr.Add(ptr, 8));
             }
 
             // We use Flags.TotalBonfireFlags.Length to get the total amount of bonfires because
