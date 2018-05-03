@@ -1,20 +1,16 @@
-﻿using Microsoft.Win32.SafeHandles;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
-namespace CapitaineToinon.DarkSoulsMemory
+namespace LiveSplit.DarkSoulsTracker.Tools
 {
     internal static class Kernel
     {
-        #region IntPtr
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool CloseHandle(IntPtr hObject);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern UInt32 WaitForSingleObject(IntPtr handle,UInt32 milliseconds);
-        #endregion
+        public static extern UInt32 WaitForSingleObject(IntPtr handle, UInt32 milliseconds);
 
-        #region IntPtr
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr OpenProcess(IntPtr dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
@@ -37,7 +33,7 @@ namespace CapitaineToinon.DarkSoulsMemory
         public static extern int CreateRemoteThread(IntPtr hProcess, int lpThreadAttributes, int dwStackSize, int lpStartAddress, int lpParameter, int dwCreationFlags, int lpThreadId);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenThread(IntPtr dwDesiredAccess,bool bInheritHandle,UInt32 dwThreadId);
+        public static extern IntPtr OpenThread(IntPtr dwDesiredAccess, bool bInheritHandle, UInt32 dwThreadId);
 
         [DllImport("kernel32.dll")]
         public static extern UInt32 SuspendThread(IntPtr hThread);
@@ -46,7 +42,6 @@ namespace CapitaineToinon.DarkSoulsMemory
         public static extern UInt32 ResumeThread(IntPtr hThread);
 
         [DllImport("kernel32.dll")]
-        public static extern bool FlushInstructionCache(IntPtr hProcess,IntPtr lpBaseAddress,UIntPtr dwSize);
-        #endregion
+        public static extern bool FlushInstructionCache(IntPtr hProcess, IntPtr lpBaseAddress, UIntPtr dwSize);
     }
 }

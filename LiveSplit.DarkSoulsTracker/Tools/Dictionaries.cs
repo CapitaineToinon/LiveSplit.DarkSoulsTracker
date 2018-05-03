@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CapitaineToinon.DarkSoulsMemory
+namespace LiveSplit.DarkSoulsTracker.Tools
 {
     internal enum HookingStates
     {
