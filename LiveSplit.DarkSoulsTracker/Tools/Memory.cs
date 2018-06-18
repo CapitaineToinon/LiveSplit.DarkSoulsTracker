@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace LiveSplit.DarkSoulsTracker.Tools
+namespace LiveSplit.DarkSoulsTracker
 {
     internal class Memory
     {

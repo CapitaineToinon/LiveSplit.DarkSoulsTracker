@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LiveSplit.DarkSoulsTracker.Tools
+namespace LiveSplit.DarkSoulsTracker
 {
     internal static class Pointers
     {

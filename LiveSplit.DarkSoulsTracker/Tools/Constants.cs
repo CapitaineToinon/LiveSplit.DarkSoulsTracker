@@ -1,4 +1,4 @@
-﻿namespace LiveSplit.DarkSoulsTracker.Tools
+﻿namespace LiveSplit.DarkSoulsTracker
 {
     internal static class Constants
     {

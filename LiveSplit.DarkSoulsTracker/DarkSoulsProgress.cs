@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using LiveSplit.DarkSoulsTracker.Tools;
 
 namespace LiveSplit.DarkSoulsTracker
 {
@@ -35,6 +32,8 @@ namespace LiveSplit.DarkSoulsTracker
                 return percentage;
             }
         }
+
+        public List<Requirement> Requirements { get => requirements; }
 
         public DarkSoulsProgress(DarkSoulsProcess darkSoulsProcess)
         {

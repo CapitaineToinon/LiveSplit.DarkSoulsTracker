@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LiveSplit.DarkSoulsTracker.Tools
+namespace LiveSplit.DarkSoulsTracker
 {
     internal static class Flags
     {

@@ -1,15 +1,11 @@
-﻿using LiveSplit.DarkSoulsTracker.LiveSplit;
+﻿using LiveSplit.DarkSoulsTracker;
 using LiveSplit.Model;
 using LiveSplit.UI.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 [assembly: ComponentFactory(typeof(DarkSouls100TrackerFactory))]
 
-namespace LiveSplit.DarkSoulsTracker.LiveSplit
+namespace LiveSplit.DarkSoulsTracker
 {
     class DarkSouls100TrackerFactory : IComponentFactory
     {
@@ -29,7 +25,7 @@ namespace LiveSplit.DarkSoulsTracker.LiveSplit
 
         public IComponent Create(LiveSplitState state)
         {
-            return new DarkSoulsTracker(state);
+            return new DarkSouls100Tracker(state);
         }
     }
 }
